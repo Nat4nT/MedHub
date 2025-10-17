@@ -3,7 +3,7 @@ version: '3.8'
 services:
   app:
     build: .
-    container_name: php_app
+    container_name: medihub
     environment:
       - MYSQL_HOST=mysql
       - MYSQL_DATABASE=medhub
@@ -18,7 +18,7 @@ services:
 
   mysql:
     image: mysql:8.0
-    container_name: mysql
+    container_name: medhub_db
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: tads2023!
