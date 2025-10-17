@@ -29,7 +29,6 @@ class DB
     public function conn(): PDO
     {
         $conn = null;
-
         try {
             $conn = new PDO("mysql:host=$this->host;dbname=$this->db", $this->user, $this->pass, [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
 

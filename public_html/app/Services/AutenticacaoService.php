@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Services;
+
+use App\Helpers\Token;
+use App\Models\UsuarioModel;
+
+class AutenticacaoService
+{
+
+    public function realizarLogin($email_login, $senha)
+    {
+
+        $usuario = (new UsuarioModel())->buscarPorEmail($email_login);
+
+        if (!$usuario || !password_verify($senha, $usuario['senha'])) {
+            return null;
+        }
+
+        return Token::gerarToken([
+            'usuario_id' => $usuario['usuario_id'],
+            'tipo_usuario' => $usuario['tipo_usuario']
+        ]);
+    }
+}
