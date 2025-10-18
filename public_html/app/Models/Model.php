@@ -45,11 +45,11 @@ abstract class Model
      */
     public function AddData(array $dados): int
     {
+
         if (isset($dados['files'])) {
             $dados['foto'] = $this->uploadImage($dados['files']);
             unset($dados['files']);
         }
-
         $colunas = array_keys($dados);
 
         $placeholders = array_map(function ($c) {

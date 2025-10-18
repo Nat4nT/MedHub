@@ -5,6 +5,8 @@ use Slim\Factory\AppFactory;
 
 $app = AppFactory::create();
 
+$app->addBodyParsingMiddleware();
+
 // Middleware de erro
 $app->addErrorMiddleware(true, true, true);
 

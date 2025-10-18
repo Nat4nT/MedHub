@@ -6,6 +6,7 @@ use App\Helpers\Token;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
+
 class AutenticacaoController
 {
     public function login(Request $request, Response $response, $args): Response

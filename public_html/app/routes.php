@@ -1,21 +1,23 @@
 <?php
 
-use App\Controller\LoginController;
-use App\Controller\UsuarioController;
+use App\Controllers\LoginController;
+use App\Controllers\UsuarioController;
 use App\Middlewares\AutenticacaoMiddleware;
 use Slim\App;
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Slim\Handlers\Strategies\RequestHandler;
 
+
+// caminho :C:\Users\Natan\Documents\Natan\TADS\Codigos\MedHUBApi\public_html\app\routes.php
 
 return function (App $app) {
 
-    $app->post('/login', [LoginController::class,'realizarLogin']);
-    $app->post('/registrar', [UsuarioController::class,'realizarCadastro']);
-    
+    $app->post('/login', [LoginController::class, 'realizarLogin']);
 
-    $app->get('/minha-conta/{/ref}',[UsuarioController::class,'pegarDadosConta'])->add(AutenticacaoMiddleware::class);
+    $app->post('/registrar', [UsuarioController::class, 'realizarCadastro']);
 
-  
+
+    $app->get('/minha-conta/{/ref}', [UsuarioController::class, 'pegarDadosConta'])->add(AutenticacaoMiddleware::class);
+
+    $app->post('/teste', function ($request, $response) {
+        
+    });
 };

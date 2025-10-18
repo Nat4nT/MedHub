@@ -64,6 +64,10 @@ class ComposerStaticInit63661d32234c94a7c47675fbaa16f77c
             'Cake\\Core\\' => 10,
             'Cake\\Chronos\\' => 13,
         ),
+        'A' => 
+        array (
+            'App\\' => 4,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
@@ -180,6 +184,10 @@ class ComposerStaticInit63661d32234c94a7c47675fbaa16f77c
         'Cake\\Chronos\\' => 
         array (
             0 => __DIR__ . '/..' . '/cakephp/chronos/src',
+        ),
+        'App\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/app',
         ),
     );
 

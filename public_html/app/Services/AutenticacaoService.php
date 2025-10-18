@@ -13,13 +13,13 @@ class AutenticacaoService
 
         $usuario = (new UsuarioModel())->buscarPorEmail($email_login);
 
-        if (!$usuario || !password_verify($senha, $usuario['senha'])) {
-            return null;
-        }
+        if (!$usuario)return null;
+        
+        if(!password_verify($senha, $usuario->senha)) return null;
 
         return Token::gerarToken([
-            'usuario_id' => $usuario['usuario_id'],
-            'tipo_usuario' => $usuario['tipo_usuario']
+            'usuario_id' => $usuario->usuario_id,
+            'tipo_usuario' => $usuario->tipo_usuario
         ]);
     }
 }

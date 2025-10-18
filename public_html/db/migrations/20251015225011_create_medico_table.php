@@ -13,7 +13,7 @@ final class CreateMedicoTable extends AbstractMigration
             'primary_key' => ['medico_id']
         ]);
 
-        $table->addColumn('medico_id', 'integer', ['signed' => false])
+        $table->addColumn('medico_id', 'integer', ['signed' => false,'null'=>false])
               ->addColumn('especialidade', 'string', ['limit' => 500])
               ->addColumn('crm', 'string', ['limit' => 10])
               ->addColumn('estado_atuacao', 'enum', [
@@ -21,9 +21,10 @@ final class CreateMedicoTable extends AbstractMigration
                       'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO',
                       'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI',
                       'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
-                  ]
+                  ],
+                  'null'=> false
               ])
-              ->create();
+              ->save();
 
         // Adiciona a chave estrangeira ligando medico.medico_id a usuario.usuario_id
         $this->table('medico')

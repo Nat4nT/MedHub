@@ -9,6 +9,7 @@ services:
       - MYSQL_DATABASE=medhub
       - MYSQL_USER=developmentMedHub
       - MYSQL_PASSWORD=dev123
+      - CHAVE_CRIPTOGRAFIA=/FNSEq9oHUZupiTtYnwsaxL/TC2R5g2p5ocIqc1sg3s=
     depends_on:
       - mysql
     ports:

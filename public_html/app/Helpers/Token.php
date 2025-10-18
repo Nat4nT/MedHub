@@ -8,10 +8,20 @@ use DateTimeImmutable;
 
 class Token
 {
-    private static string $secret = 'minha-chave-secreta'; // coloque no .env depois
+    private static  $secret;
+    private static function getSecret(): string
+    {
+        if (!self::$secret) {
+            self::$secret = getenv('CHAVE_CRIPTOGRAFIA');
+        }
+
+        return self::$secret;
+    }
+
 
     public static function gerarToken(array $payload): string
     {
+        $secret = self::getSecret();
         $agora = new DateTimeImmutable();
         $expira = $agora->modify('+1 hour')->getTimestamp();
 
@@ -19,12 +29,15 @@ class Token
             'iat' => $agora->getTimestamp(),
             'exp' => $expira,
         ]);
+        
 
-        return JWT::encode($dados, self::$secret, 'HS256');
+        return JWT::encode($dados, $secret, 'HS256');
     }
 
     public static function validarToken(string $token): object
     {
-        return JWT::decode($token, new Key(self::$secret, 'HS256'));
+        $secret = self::getSecret();
+
+        return JWT::decode($token, new Key($secret, 'HS256'));
     }
 }

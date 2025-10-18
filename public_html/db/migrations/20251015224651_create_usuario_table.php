@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Phinx\Db\Adapter\MysqlAdapter;
 use Phinx\Migration\AbstractMigration;
 
 final class CreateUsuarioTable extends AbstractMigration
@@ -14,8 +15,8 @@ final class CreateUsuarioTable extends AbstractMigration
             ->addColumn('primeiro_nome', 'string', ['limit' => 100])
             ->addColumn('ultimo_nome', 'string', ['limit' => 100])
             ->addColumn('genero', 'integer', ['limit' => 11, 'default' => 0])
-            ->addColumn('imagem_perfil', 'text', ['null' => true, 'limit' => \Phinx\Db\Adapter\MysqlAdapter::TEXT_LONG])
-            ->addColumn('cpf', 'string', ['limit' => 11])
+            ->addColumn('imagem_perfil', 'text', ['null' => true, 'limit' => 300])
+            ->addColumn('cpf', 'text', ['limit' => MysqlAdapter::TEXT_LONG])
             ->addColumn('telefone', 'string', ['limit' => 15])
             ->addColumn('email', 'string', ['limit' => 70])
             ->addColumn('senha', 'string', ['limit' => 255])
