@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Helpers\Criptografia;
 use App\Models\MedicoModel;
+use App\Models\PacienteModel;
 use App\Models\UsuarioModel;
 use App\Services\AutenticacaoService;
 
@@ -52,7 +53,16 @@ class CadastroService
                     ];
                     (new MedicoModel())->AddData($dadosTipoUsuario);
                 } else {
-                    $dadosTipoUsuario = [];
+                    $dadosTipoUsuario = [
+                        'paciente_id' => $id_novo_usuario,
+                        'data_nascimento' => $dados['data_nascimento'],
+                        'peso' => $dados['peso'] ?? null,
+                        'altura' => $dados['altura'] ?? null,
+                        'desc_deficiencia' => $dados['desc_deficiencia'] ?? null,
+                        'tipo_sanguineo' => $dados['tipo_sanguineo'] ?? null,
+                        'alergias' => $dados['alergias'] ?? null
+                    ];
+                    (new PacienteModel())->addData($dadosTipoUsuario);
                 }
 
                 $token = (new AutenticacaoService())->realizarLogin($dados['email'], $senha_login);

@@ -1,0 +1,22 @@
+{
+  "route": "localhost:8080/registrar",
+  "body": {
+    "tipo_usuario": "paciente",
+    "primeiro_nome": "Usuario Paciente",
+    "ultimo_nome": "Silva",
+    "genero": 2,
+    "imagem_perfil": null,
+    "cpf": "12345678998",
+    "telefone": "4545454545",
+    "email": "joao.pedro.paciente@example.com",
+    "consentimento_lgpd": 1,
+    "senha": "paciente123@",
+    "data_nascimento": "2000-05-15",
+    "tipo_sanguineo": "AB-",
+    "peso": 85.75,
+    "altura": 1.75,
+    "desc_deficiencia": null,
+    "alergias": null
+  },
+  "campos_que_podem_ser_null": "desc_deficiencia,alergias,peso,altura,imagem_perfil,tipo_sanguineo"
+}
