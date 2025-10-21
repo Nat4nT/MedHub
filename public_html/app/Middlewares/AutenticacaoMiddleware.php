@@ -25,8 +25,7 @@ class AutenticacaoMiddleware implements MiddlewareInterface
 
         try {
             $decoded = Token::validarToken($token);
-            // você pode salvar no request se quiser usar na rota:
-            $request = $request->withAttribute('usuario', $decoded->user);
+            $request = $request->withAttribute('usuario', $decoded);
         } catch (Exception $e) {
             return $this->unauthorized('Token inválido ou expirado');
         }

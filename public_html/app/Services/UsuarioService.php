@@ -8,7 +8,7 @@ use App\Models\PacienteModel;
 use App\Models\UsuarioModel;
 use App\Services\AutenticacaoService;
 
-class CadastroService
+class UsuarioService
 {
 
     public function realizarCadastro(array $dados = [])
@@ -30,7 +30,7 @@ class CadastroService
             'consentimento_lgpd' => $dados['consentimento_lgpd']
         ];
 
-        if (!is_null($dados['imagem_perfil'])) {
+        if (isset($dados['imagem_perfil']) && !is_null($dados['imagem_perfil'])) {
             $dadosUsuario['files'] = [$dados['imagem_perfil']];
         }
 
@@ -73,5 +73,48 @@ class CadastroService
         } else {
             return ['status' => 401, 'mensagem' => "Email já cadastrado!"];
         }
+    }
+
+    public function buscarDados(string $tipo)
+    {
+        $usuarioModel = new UsuarioModel();
+        $dados = $usuarioModel->buscarUsuario($tipo);
+
+        if ($dados) {
+            $coluna = $tipo . '_id';
+            unset($dados['usuario_id'], $dados[$coluna]);
+
+            $dados['cpf'] = (new Criptografia())->decriptarDado($dados['cpf']);
+            $mensagem = [
+                "mensagem" => 'Perfil encontrado',
+                'dados' => $dados,
+                'status' => 200
+            ];
+        } else {
+            $mensagem = [
+                "mensagem" => 'Perfil não encontrado',
+                'dados' => [],
+                'status' => 404
+            ];
+        }
+        return $mensagem;
+    }
+
+    public function desativar($id_perfil)
+    {
+        if ($id_perfil == '') {
+            return [
+                "mensagem" => 'Id não informado',
+                'status' => 504
+            ];
+        }
+
+        $usuarioModel = new UsuarioModel($id_perfil);
+        $usuarioModel->desativarPerfil();
+
+        return [
+            "mensagem" => 'Perfil desativado com sucesso',
+            'status' => 200
+        ];
     }
 }

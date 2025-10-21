@@ -30,7 +30,10 @@ class Criptografia
         $ivlen = openssl_cipher_iv_length($this->cipher);
         $iv = substr($data, 0, $ivlen);
         $encrypted = substr($data, $ivlen);
+
         $decrypted = openssl_decrypt($encrypted, $this->cipher, $this->key, 0, $iv);
+
+
         return $decrypted;
     }
 }

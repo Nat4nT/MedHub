@@ -7,7 +7,7 @@ use PDO;
 class UsuarioModel extends Model
 {
     public $table = 'usuario';
-    public $id_column_name = 'id_usuario';
+    public $id_column_name = 'usuario_id';
 
     public function buscarPorEmail($email)
     {
@@ -16,5 +16,16 @@ class UsuarioModel extends Model
         $stmt->bindValue(":email", $email);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_OBJ);
+    }
+
+    public function buscarUsuario(string $tabela_append){
+        $sql = "SELECT * FROM {$this->table} INNER JOIN {$tabela_append} ON {$tabela_append}_id = {$this->id_column_name}";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function desativarPerfil(){
+        $sql = "UPDATE {$this->table} SET `status` = 0 WHERE {$this->id_column_name} = {$this->id} ";
     }
 }

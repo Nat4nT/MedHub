@@ -15,9 +15,13 @@ return function (App $app) {
     $app->post('/registrar', [UsuarioController::class, 'realizarCadastro']);
 
 
-    $app->get('/minha-conta/{/ref}', [UsuarioController::class, 'pegarDadosConta'])->add(AutenticacaoMiddleware::class);
+    $app->get('/minha-conta', [UsuarioController::class, 'pegarDadosConta'])->add(AutenticacaoMiddleware::class);
+    $app->post('/minha-conta', [UsuarioController::class, 'editarDados'])->add(AutenticacaoMiddleware::class);
 
     $app->post('/teste', function ($request, $response) {
-        
+        $authorizationHeader = $request->getHeaderLine('Authorization');
+        var_dump($authorizationHeader);
+        die;
+    
     });
 };
