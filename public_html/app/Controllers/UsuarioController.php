@@ -34,7 +34,13 @@ class UsuarioController
         return $jsonResponse->emitirResposta($response, ["mensagem" => $resposta['mensagem'], 'dados' => $resposta['dados']], $resposta['status']);
     }
 
-
+    public function editarUsuario(Request $request, Response $response): Response
+    {
+        $dadosUsuario = $request->getAttribute('usuario');
+        $dadosFormulario = $request->getParsedBody();
+        $resposta = (new UsuarioService())->editarUsuario($dadosUsuario->tipo_usuario, $dadosFormulario);
+        return (new JsonResponse())->emitirResposta($response, ["mensagem" => $resposta['mensagem'], 'status' => $resposta['status']]);
+    }
     public function desativarPerfil(Request $request, Response $response): Response
     {
         $dadosUsuario = $request->getAttribute('usuario');

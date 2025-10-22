@@ -20,11 +20,9 @@ final class CreateUsuarioTable extends AbstractMigration
             ->addColumn('telefone', 'string', ['limit' => 15])
             ->addColumn('email', 'string', ['limit' => 70])
             ->addColumn('senha', 'string', ['limit' => 255])
-            ->addColumn('data_cadastro', 'datetime', ['default' => 'CURRENT_TIMESTAMP'])
-            ->addColumn('data_atualizacao', 'datetime', ['default' => 'CURRENT_TIMESTAMP', 'update' => 'CURRENT_TIMESTAMP'])
             ->addColumn('consentimento_lgpd', 'boolean', ['default' => false])
             ->addColumn('status', 'boolean', ['default'=> true])
             ->addIndex(['email'], ['unique' => true]) 
-            ->create();
+            ->addTimestamps()->create();
     }
 }

@@ -72,7 +72,7 @@ CREATE TABLE `categoria_exame` (
 CREATE TABLE `condicao` (
   `condicao_id` int(11) NOT NULL,
   `nome` varchar(100) NOT NULL,
-  `tipo` enum('Alergia','Doenca','Deficiencia') NOT NULL,
+  `tipo` enum('alergia','doenca','deficiencia') NOT NULL,
   `data_criacao` datetime NOT NULL DEFAULT current_timestamp(),
   `data_atualizacao` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

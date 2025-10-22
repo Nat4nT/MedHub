@@ -18,9 +18,10 @@ final class CreatePacienteTable extends AbstractMigration
             ->addColumn('data_nascimento', 'date', ['null' => false])
             ->AddColumn('peso', 'decimal', ['precision' => 5, 'scale' => 2, 'null' => true, 'default' => null])
             ->AddColumn('altura', 'decimal', ['precision' => 3, 'scale' => 2, 'null' => true, 'default' => null])
-            ->addColumn('desc_deficiencia', 'string', ['limit' => 100, 'default' => null])
+            ->addColumn('desc_deficiencia', 'string', ['limit' => 500, 'default' => null])
             ->addColumn('tipo_sanguineo', 'enum', ['values' => ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'], 'default' => null])
             ->addColumn('alergias', 'string', ['limit' => 500, 'default' => null])
+            ->addColumn('doencas_diagnosticadas', 'string', ['limit' => 500, 'default' => null])
             ->save();
 
         $this->table('paciente')
