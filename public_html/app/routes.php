@@ -14,14 +14,15 @@ return function (App $app) {
 
     $app->post('/registrar', [UsuarioController::class, 'realizarCadastro']);
 
-
-    $app->get('/minha-conta', [UsuarioController::class, 'pegarDadosConta'])->add(AutenticacaoMiddleware::class);
-    $app->post('/minha-conta', [UsuarioController::class, 'editarDados'])->add(AutenticacaoMiddleware::class);
+    $app->group('/minha-conta', function ($group) {
+        $group->get('', [UsuarioController::class, 'pegarDadosConta']);
+        $group->post('', [UsuarioController::class, 'editarUsuario']);
+        $group->post('/deletar', [UsuarioController::class, 'desativarPerfil']);
+    })->add(AutenticacaoMiddleware::class);
 
     $app->post('/teste', function ($request, $response) {
         $authorizationHeader = $request->getHeaderLine('Authorization');
         var_dump($authorizationHeader);
         die;
-    
     });
 };

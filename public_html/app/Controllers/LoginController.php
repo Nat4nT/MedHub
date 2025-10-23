@@ -22,12 +22,17 @@ class LoginController
         $json = new JsonResponse();
 
         if (!$token) {
-            return $json->emitirResposta($response, ['error' => 'Login inválido'], 401);
+            return $json->emitirResposta($response, ['message' => 'Login inválido', 'data' => [], 'code' => 401], 401);
         }
 
-        
 
-        return $json->emitirResposta($response, ['token' => $token]);
+        $data = [
+            'message' => 'Login realizado com sucesso',
+            'data' => [
+                'token' => $token
+            ],
+            'code' => 200
+        ];
+        return $json->emitirResposta($response, $data, 200);
     }
-
 }

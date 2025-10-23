@@ -17,13 +17,13 @@ class UsuarioController
         $jsonResponse = new JsonResponse();
 
         if (is_null($data) || empty($data) || !isset($data['consentimento_lgpd']) || $data['consentimento_lgpd'] == 0) {
-            return   $jsonResponse->emitirResposta($response, ['mensagem' => "Não consente com a LGPD"], 400);
+            return   $jsonResponse->emitirResposta($response, ['message' => "Não consente com a LGPD",'code'=> 400], 400);
         }
 
         $resposta = (new UsuarioService())->realizarCadastro($data);
 
 
-        return $jsonResponse->emitirResposta($response, ["mensagem" => $resposta['mensagem'], 'token' => $resposta['token']], $resposta['status']);
+        return $jsonResponse->emitirResposta($response, ["message" => $resposta['mensagem'], "data"=>['token' => $resposta['token']],'code'=>$resposta['code']], $resposta['code']);
     }
 
     public function pegarDadosConta(Request $request, Response $response): Response
@@ -31,22 +31,22 @@ class UsuarioController
         $dadosUsuario = $request->getAttribute('usuario');
         $resposta = (new UsuarioService())->buscarDados($dadosUsuario->tipo_usuario);
         $jsonResponse = new JsonResponse();
-        return $jsonResponse->emitirResposta($response, ["mensagem" => $resposta['mensagem'], 'dados' => $resposta['dados']], $resposta['status']);
+        return $jsonResponse->emitirResposta($response, ["message" => $resposta['message'], 'data' => $resposta['data'],'code'=>$resposta['code']], $resposta['code']);
     }
 
     public function editarUsuario(Request $request, Response $response): Response
     {
         $dadosUsuario = $request->getAttribute('usuario');
         $dadosFormulario = $request->getParsedBody();
-        $resposta = (new UsuarioService())->editarUsuario($dadosUsuario->tipo_usuario, $dadosFormulario);
-        return (new JsonResponse())->emitirResposta($response, ["mensagem" => $resposta['mensagem'], 'status' => $resposta['status']]);
+        $resposta = (new UsuarioService())->editarUsuario($dadosUsuario, $dadosFormulario);
+        return (new JsonResponse())->emitirResposta($response, ["message" => $resposta['message'], 'code' => $resposta['code']], $resposta['code']);
     }
     public function desativarPerfil(Request $request, Response $response): Response
     {
         $dadosUsuario = $request->getAttribute('usuario');
-        $resposta = (new UsuarioService())->desativar($dadosUsuario->id_usuario);
+        $resposta = (new UsuarioService())->desativar($dadosUsuario->usuario_id);
         $jsonResponse = new JsonResponse();
 
-        return $jsonResponse->emitirResposta($response, ["mensagem" => $resposta['mensagem'], $resposta['status']]);
+        return $jsonResponse->emitirResposta($response, ["message" => $resposta['message'],'code'=> $resposta['code']], $resposta['code']);
     }
 }

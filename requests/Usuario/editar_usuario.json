@@ -1,5 +1,9 @@
 {
-  "route": "localhost:8080/registrar",
+  "route": "localhost:8080/minha_conta",
+  "method": "POST",
+  "Header": {
+    "Auth": "Bearer token"
+  },
   "body": {
     "tipo_usuario": "paciente",
     "primeiro_nome": "Natan Teixeira",
@@ -28,5 +32,6 @@
       "complemento": "Casa"
     }
   },
+  "regra": "mesmos campos que criar",
   "campos_que_podem_ser_null": "desc_deficiencia,alergias,peso,altura,imagem_perfil,tipo_sanguineo"
 }

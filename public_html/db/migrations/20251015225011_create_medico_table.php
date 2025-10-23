@@ -24,14 +24,10 @@ final class CreateMedicoTable extends AbstractMigration
                   ],
                   'null'=> false
               ])
-              ->save();
-
-        // Adiciona a chave estrangeira ligando medico.medico_id a usuario.usuario_id
-        $this->table('medico')
             ->addForeignKey('medico_id', 'usuario', 'usuario_id', [
                 'delete' => 'CASCADE',
                 'update' => 'NO_ACTION'
             ])
-            ->update();
+            ->create();
     }
 }

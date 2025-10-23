@@ -22,13 +22,10 @@ final class CreatePacienteTable extends AbstractMigration
             ->addColumn('tipo_sanguineo', 'enum', ['values' => ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'], 'default' => null])
             ->addColumn('alergias', 'string', ['limit' => 500, 'default' => null])
             ->addColumn('doencas_diagnosticadas', 'string', ['limit' => 500, 'default' => null])
-            ->save();
-
-        $this->table('paciente')
             ->addForeignKey('paciente_id', 'usuario', 'usuario_id', [
                 'delete' => 'CASCADE',
                 'update' => 'NO_ACTION'
             ])
-            ->update();
+            ->create();
     }
 }

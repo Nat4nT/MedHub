@@ -25,8 +25,8 @@ class UsuarioService
             'telefone' => $dados['telefone'] ?? null,
             'email' => $dados['email'] ?? null,
             'consentimento_lgpd' => $dados['consentimento_lgpd'] ?? 0,
-
         ];
+
         if (isset($dados['imagem_perfil']) && !is_null($dados['imagem_perfil'])) {
             $dadosUsuario['files'] = $dados['imagem_perfil'];
         }
@@ -37,7 +37,7 @@ class UsuarioService
         return $dadosUsuario;
     }
 
-    private function prepareAddressData(int $usuarioId, array $dadosEnderecoForm): array
+    private function prepareAddressData($usuarioId, array $dadosEnderecoForm): array
     {
         return [
             'usuario_id' => $usuarioId,
@@ -51,7 +51,7 @@ class UsuarioService
         ];
     }
 
-    private function prepareMedicoData(int $usuarioId, array $dados): array
+    private function prepareMedicoData($usuarioId, array $dados): array
     {
         return [
             'medico_id' => $usuarioId,
@@ -74,18 +74,6 @@ class UsuarioService
             'alergias' => $dados['alergias'] ?? null
         ];
 
-        if (isset($dados['condicoes'])) {
-            if (isset($dados['condicoes']['alergia'])) {
-                $dados_usuario['alergias'] = $dados['condicoes']['alergia'];
-            }
-            if (isset($dados['condicoes']['doenca'])) {
-                $dados_usuario['doenca'] = $dados['condicoes']['doenca'];
-            }
-            if (isset($dados['condicoes']['deficiencia'])) {
-                $dados_usuario['deficiencia'] = $dados['condicoes']['deficiencia'];
-            }
-        }
-
         return $dados_usuario;
     }
 
@@ -95,10 +83,10 @@ class UsuarioService
         $usuarioModel = new UsuarioModel();
 
         if (empty($dados)) {
-            return ['status' => 401, 'mensagem' => "Dados Inválidos"];
+            return ['code' => 401, 'message' => "Dados Inválidos"];
         }
         if ($usuarioModel->buscarPorEmail($dados["email"] ?? '')) {
-            return ['status' => 401, 'mensagem' => "Email já cadastrado!"];
+            return ['code' => 401, 'message' => "Email já cadastrado!"];
         }
 
         $senhaLogin = $dados['senha'] ?? null;
@@ -106,11 +94,12 @@ class UsuarioService
         $idNovoUsuario = $usuarioModel->AddData($dadosUsuario);
 
         if (!$idNovoUsuario) {
-            return ["status" => 500, 'mensagem' => 'Erro ao registrar usuário'];
+            return ["code" => 500, 'message' => 'Erro ao registrar usuário'];
         }
 
         if (isset($dados['endereco'])) {
             $dadosEndereco = $this->prepareAddressData($idNovoUsuario, $dados['endereco']);
+
             (new EnderecoModel())->AddData($dadosEndereco);
         }
 
@@ -122,48 +111,48 @@ class UsuarioService
             (new PacienteModel())->addData($dadosTipoUsuario);
         }
         $token = (new AutenticacaoService())->realizarLogin($dados['email'], $senhaLogin);
-        return ['status' => 200, 'mensagem' => "Cadastro realizado com sucesso", "token" => $token];
+        return ['code' => 200, 'message' => "Cadastro realizado com sucesso", "token" => $token];
     }
 
     public function buscarDados(string $tipo): array
     {
         $dados = (new UsuarioModel())->buscarUsuario($tipo);
 
-        if ($dados) {
+        if ($dados && $dados['status'] == 1) {
             $coluna = $tipo . '_id';
-            unset($dados['usuario_id'], $dados[$coluna]);
+            unset($dados['usuario_id'], $dados[$coluna], $dados['endereco_id']);
 
             $dados['cpf'] = (new Criptografia())->decriptarDado($dados['cpf']);
 
             return [
-                "mensagem" => 'Perfil encontrado',
-                'dados' => $dados,
-                'status' => 200
+                "message" => 'Perfil encontrado',
+                'data' => $dados,
+                'code' => 200
             ];
         }
 
         return [
-            "mensagem" => 'Perfil não encontrado',
-            'dados' => [],
-            'status' => 404
+            "message" => 'Perfil não encontrado',
+            'data' => [],
+            'code' => 404
         ];
     }
 
 
     public function editarUsuario(object $dadosSessao, array $dadosFormulario): array
     {
-        $usuarioId = $dadosSessao->id_usuario;
+        $usuarioId = $dadosSessao->usuario_id;
         $tipoUsuario = $dadosSessao->tipo_usuario;
 
         $dadosUsuario = $this->prepareUserData($dadosFormulario);
 
-        if (empty($dadosFormulario['senha'])) {
+        if (isset($dadosFormulario['senha']) && empty($dadosFormulario['senha'])) {
             unset($dadosUsuario['senha']);
         }
         (new UsuarioModel($usuarioId))->editData($dadosUsuario);
 
         $dadosEndereco = $this->prepareAddressData($usuarioId, $dadosFormulario['endereco']);
-        (new EnderecoModel($usuarioId))->editData($dadosUsuario);
+        (new EnderecoModel($usuarioId))->editData($dadosEndereco);
 
         if ($tipoUsuario === 'medico') {
             $dadosTipoUsuario = $this->prepareMedicoData($usuarioId, $dadosFormulario);
@@ -175,8 +164,8 @@ class UsuarioService
 
 
         return [
-            "mensagem" => 'Perfil atualizado com sucesso',
-            'status' => 200
+            "message" => 'Perfil atualizado com sucesso',
+            'code' => 200
         ];
     }
 
@@ -185,15 +174,21 @@ class UsuarioService
     {
         if (empty($idPerfil)) {
             return [
-                "mensagem" => 'ID não informado',
-                'status' => 400
+                "message" => 'ID não informado',
+                'code' => 400
             ];
         }
-        (new UsuarioModel($idPerfil))->desativarPerfil();
-
-        return [
-            "mensagem" => 'Perfil desativado com sucesso',
-            'status' => 200
-        ];
+        $response = (new UsuarioModel($idPerfil))->desativarPerfil();
+        if ($response) {
+            return [
+                "message" => 'Perfil desativado com sucesso',
+                'code' => 200
+            ];
+        } else {
+            return [
+                "message" => 'Erro ao inativar perfil',
+                'code' => 200
+            ];
+        }
     }
 }

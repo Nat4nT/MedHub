@@ -13,7 +13,16 @@
     "senha": "dev123@",
     "especialidade": "Cardiologia",
     "crm": "CRM1234567",
-    "estado_atuacao": "SP"
+    "estado_atuacao": "SP",
+    "endereco": {
+      "rua": "Minha rua",
+      "bairro": "Meu Bairro",
+      "numero": "1601",
+      "cep": "85869380",
+      "cidade": "São Paulo",
+      "estado": "SP",
+      "complemento": "Casa"
+    }
   },
   "campos_que_podem_ser_null": "imagem_perfil"
 }

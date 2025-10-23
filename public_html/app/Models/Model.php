@@ -14,10 +14,6 @@ abstract class Model
     public function __construct($id = 0)
     {
         $this->id = $id;
-        // Define automaticamente o user_token com base na session
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start(); // inicia a session, se ainda não foi
-        }
         $this->conn = (new DB())->conn();
     }
 
@@ -80,6 +76,7 @@ abstract class Model
     {
         $params = [];
         $set = [];
+
         foreach ($dados as $col => $val) {
             $set[] = "`$col` = :$col";
             $params[$col] = $val;
@@ -90,7 +87,6 @@ abstract class Model
 
         $params[$this->id_column_name] = $this->id;
         $stmt = $this->conn->prepare($sql);
-
         $stmt->execute($params);
 
         if ($stmt->rowCount()) {
