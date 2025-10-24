@@ -1,5 +1,5 @@
 criar bancos : 
-    docker exec -it medihub vendor/bin/phinx migrate -e development
+    docker exec -it medihub public_html/vendor/bin/phinx migrate -e development
 
 levantar ambiente 
 

@@ -11,13 +11,13 @@ use Slim\App;
 return function (App $app) {
 
     $app->post('/login', [LoginController::class, 'realizarLogin']);
-
     $app->post('/registrar', [UsuarioController::class, 'realizarCadastro']);
 
-    $app->group('/minha-conta', function ($group) {
-        $group->get('', [UsuarioController::class, 'pegarDadosConta']);
-        $group->post('', [UsuarioController::class, 'editarUsuario']);
-        $group->post('/deletar', [UsuarioController::class, 'desativarPerfil']);
+    
+    $app->group('/minha-conta', function ($user) {
+        $user->get('', [UsuarioController::class, 'pegarDadosConta']);
+        $user->post('', [UsuarioController::class, 'editarUsuario']);
+        $user->post('/deletar', [UsuarioController::class, 'desativarPerfil']);
     })->add(AutenticacaoMiddleware::class);
 
     $app->post('/teste', function ($request, $response) {

@@ -1,5 +1,5 @@
 {
-    "route": "localhost:8080/minha_conta",
+    "route": "localhost:8080/minha-conta",
     "method": "GET",
     "Header": {
       "Auth": "Bearer token"

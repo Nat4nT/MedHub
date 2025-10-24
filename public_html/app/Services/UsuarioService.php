@@ -13,18 +13,51 @@ use App\Services\AutenticacaoService;
 class UsuarioService
 {
 
+    private function validarCamposUsuario(array $usuario)
+    {
+        $erro = 0;
+        $mensagem = [];
+        if (!isset($usuario["tipo_usuario"]) || is_null($usuario["tipo_usuario"])) {
+            $erro = 1;
+            $mensagem["tipo_usuaario"] = "Tipo Usuario Invalido";
+        }
+
+        if (!isset($usuario["primeiro_nome"]) || is_null($usuario["primeiro_nome"])) {
+            $erro = 1;
+            $mensagem["primeiro_nome"] = "Campo Primeiro Nome Invalido";
+        }
+
+        if (!isset($usuario["ultimo_nome"]) || is_null($usuario["ultimo_nome"])) {
+            $erro = 1;
+            $mensagem["ultimo_nome"] = "Campo Ultimo Nome Invalido";
+        }
+
+        if (!isset($usuario["email"]) || is_null($usuario['email'])) {
+            $erro = 1;
+            $mensagem['email'] = 'Campo Email Invalido';
+        }
+
+        return ["erro" => $erro, "mensagem" => $mensagem];
+    }
 
     private function prepareUserData(array $dados): array
     {
+
+        $validacao = $this->validarCamposUsuario($dados);
+
+        if ($validacao['erro']) {
+            return ["message" => $validacao['mensagem'], 'error' => 1];
+        }
+
         $dadosUsuario = [
-            'tipo_usuario' => $dados['tipo_usuario'] ?? null,
-            "primeiro_nome" => $dados["primeiro_nome"] ?? null,
-            'ultimo_nome' => $dados['ultimo_nome'] ?? null,
-            'genero' => $dados['genero'] ?? null,
-            'cpf' => (new Criptografia())->encriptarDado($dados['cpf'] ?? ''),
+            'tipo_usuario' => $dados['tipo_usuario'],
+            "primeiro_nome" => $dados["primeiro_nome"],
+            'ultimo_nome' => $dados['ultimo_nome'],
+            'genero' => $dados['genero'] ?? 3,
+            'cpf' => (new Criptografia())->encriptarDado($dados['cpf']),
             'telefone' => $dados['telefone'] ?? null,
-            'email' => $dados['email'] ?? null,
-            'consentimento_lgpd' => $dados['consentimento_lgpd'] ?? 0,
+            'email' => $dados['email'],
+            'consentimento_lgpd' => $dados['consentimento_lgpd'] ?? 0
         ];
 
         if (isset($dados['imagem_perfil']) && !is_null($dados['imagem_perfil'])) {
@@ -37,36 +70,117 @@ class UsuarioService
         return $dadosUsuario;
     }
 
+    private function validarCamposEndereco($dados)
+    {
+        $erro = 0;
+        $mensagem = [];
+        if (isset($dados['rua']) || is_null($dados['rua'])) {
+            $erro = 1;
+            $mensagem['rua'] = 'Campo Rua Invalido';
+        }
+        if (isset($dados['bairro']) || is_null($dados['bairro'])) {
+            $erro = 1;
+            $mensagem['bairro'] = 'Campo Bairro Invalido';
+        }
+        if (isset($dados['numero']) || is_null($dados['numero'])) {
+            $erro = 1;
+            $mensagem['numero'] = 'Campo numero Invalido';
+        }
+        if (isset($dados['cep']) || is_null($dados['cep'])) {
+            $erro = 1;
+            $mensagem['cep'] = 'Campo cep Invalido';
+        }
+        if (isset($dados['cidade']) || is_null($dados['cidade'])) {
+            $erro = 1;
+            $mensagem['cidade'] = 'Campo cidade Invalido';
+        }
+        if (isset($dados['estado']) || is_null($dados['estado'])) {
+            $erro = 1;
+            $mensagem['estado']  = "Campo estado Invalido";
+        }
+
+        return [
+            'erro' => $erro,
+            'mensagem' => $mensagem
+        ];
+    }
     private function prepareAddressData($usuarioId, array $dadosEnderecoForm): array
     {
+        $validacao = $this->validarCamposEndereco($dadosEnderecoForm);
+
+        if ($validacao['erro']) {
+            return ["message" => $validacao['mensagem'], 'error' => 1];
+        }
         return [
             'usuario_id' => $usuarioId,
-            'rua' => $dadosEnderecoForm['rua'] ?? null,
-            'bairro' => $dadosEnderecoForm['bairro'] ?? null,
-            'numero' => $dadosEnderecoForm['numero'] ?? null,
-            'cep' => $dadosEnderecoForm['cep'] ?? null,
-            'cidade' => $dadosEnderecoForm['cidade'] ?? null,
-            'estado' => $dadosEnderecoForm['estado'] ?? null,
+            'rua' => $dadosEnderecoForm['rua'],
+            'bairro' => $dadosEnderecoForm['bairro'],
+            'numero' => $dadosEnderecoForm['numero'],
+            'cep' => $dadosEnderecoForm['cep'],
+            'cidade' => $dadosEnderecoForm['cidade'],
+            'estado' => $dadosEnderecoForm['estado'],
             'complemento' => $dadosEnderecoForm['complemento'] ?? ''
         ];
     }
 
+    private function validarCamposMedico($dados)
+    {
+        $erro = 0;
+        $mensagem = [];
+        if (isset($dados['crm']) || is_null($dados['crm'])) {
+            $erro = 1;
+            $mensagem['crm'] = 'Campo CRM Invalido';
+        }
+        if (isset($dados['estado_atuacao']) || is_null($dados['estado_atuacao'])) {
+            $erro = 1;
+            $mensagem['estado_atuacao'] = 'Campo Estado de Atuação Invalido';
+        }
+        return [
+            'erro' => $erro,
+            'mensagem' => $mensagem
+        ];
+    }
     private function prepareMedicoData($usuarioId, array $dados): array
     {
+        $validacao = $this->validarCamposMedico($dados);
+        if ($validacao['erro']) {
+            return ["message" => $validacao['mensagem'], 'error' => 1];
+        }
         return [
             'medico_id' => $usuarioId,
             'especialidade' => $dados['especialidade'] ?? null,
-            'crm' => $dados['crm'] ?? null,
-            'estado_atuacao' => $dados['estado_atuacao'] ?? null,
+            'crm' => $dados['crm'],
+            'estado_atuacao' => $dados['estado_atuacao'],
         ];
     }
 
 
+    private function validarCamposPaciente($dados)
+    {
+        $erro = 0;
+        $mensagem = [];
+
+        if (isset($dados['data_nascimento']) || is_null($dados['data_nascimento'])) {
+            $erro = 1;
+            $mensagem['data_nascimento'] = "Campo Data de Nascimento Invalido";
+        }
+
+        return [
+            'erro' => $erro,
+            'mensagem' => $mensagem
+        ];
+    }
+
     private function preparePacienteData(int $usuarioId, array $dados): array
     {
+        $validacao = $this->validarCamposPaciente($dados);
+        if ($validacao['erro']) {
+            return ["message" => $validacao['mensagem'], 'error' => 1];
+        }
+
         $dados_usuario = [
             'paciente_id' => $usuarioId,
-            'data_nascimento' => $dados['data_nascimento'] ?? null,
+            'data_nascimento' => $dados['data_nascimento'],
             'peso' => $dados['peso'] ?? null,
             'altura' => $dados['altura'] ?? null,
             'desc_deficiencia' => $dados['desc_deficiencia'] ?? null,
@@ -91,6 +205,11 @@ class UsuarioService
 
         $senhaLogin = $dados['senha'] ?? null;
         $dadosUsuario = $this->prepareUserData($dados);
+
+        if (isset($dadosUsuario['error'])) {
+            return ['code' => 400, 'message' => $dadosUsuario['message']];
+        }
+
         $idNovoUsuario = $usuarioModel->AddData($dadosUsuario);
 
         if (!$idNovoUsuario) {
@@ -100,14 +219,23 @@ class UsuarioService
         if (isset($dados['endereco'])) {
             $dadosEndereco = $this->prepareAddressData($idNovoUsuario, $dados['endereco']);
 
+            if (isset($dadosEndereco['error'])) {
+                return ['code' => 400, 'message' => $dadosEndereco['message']];
+            }
             (new EnderecoModel())->AddData($dadosEndereco);
         }
 
         if (($dados['tipo_usuario'] ?? '') === 'medico') {
             $dadosTipoUsuario = $this->prepareMedicoData($idNovoUsuario, $dados);
+            if (isset($dadosTipoUsuario['error'])) {
+                return ['code' => 400, 'message' => $dadosTipoUsuario['message']];
+            }
             (new MedicoModel())->AddData($dadosTipoUsuario);
         } else {
             $dadosTipoUsuario = $this->preparePacienteData($idNovoUsuario, $dados);
+            if (isset($dadosTipoUsuario['error'])) {
+                return ['code' => 400, 'message' => $dadosTipoUsuario['message']];
+            }
             (new PacienteModel())->addData($dadosTipoUsuario);
         }
         $token = (new AutenticacaoService())->realizarLogin($dados['email'], $senhaLogin);

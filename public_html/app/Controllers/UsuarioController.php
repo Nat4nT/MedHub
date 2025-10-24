@@ -23,7 +23,7 @@ class UsuarioController
         $resposta = (new UsuarioService())->realizarCadastro($data);
 
 
-        return $jsonResponse->emitirResposta($response, ["message" => $resposta['mensagem'], "data"=>['token' => $resposta['token']],'code'=>$resposta['code']], $resposta['code']);
+        return $jsonResponse->emitirResposta($response, ["message" => $resposta['message'], "data"=>['token' => $resposta['token']],'code'=>$resposta['code']], $resposta['code']);
     }
 
     public function pegarDadosConta(Request $request, Response $response): Response
