@@ -17,13 +17,13 @@ class UsuarioController
         $jsonResponse = new JsonResponse();
 
         if (is_null($data) || empty($data) || !isset($data['consentimento_lgpd']) || $data['consentimento_lgpd'] == 0) {
-            return   $jsonResponse->emitirResposta($response, ['message' => "Não consente com a LGPD",'code'=> 400], 400);
+            return   $jsonResponse->emitirResposta($response, ['message' => "Não consente com a LGPD", 'code' => 400], 400);
         }
 
         $resposta = (new UsuarioService())->realizarCadastro($data);
 
 
-        return $jsonResponse->emitirResposta($response, ["message" => $resposta['message'], "data"=>['token' => @$resposta['token']],'code'=>$resposta['code']], $resposta['code']);
+        return $jsonResponse->emitirResposta($response, ["message" => $resposta['message'], "data" => ['token' => @$resposta['token']], 'code' => $resposta['code']], $resposta['code']);
     }
 
     public function pegarDadosConta(Request $request, Response $response): Response
@@ -31,13 +31,15 @@ class UsuarioController
         $dadosUsuario = $request->getAttribute('usuario');
         $resposta = (new UsuarioService())->buscarDados($dadosUsuario);
         $jsonResponse = new JsonResponse();
-        return $jsonResponse->emitirResposta($response, ["message" => $resposta['message'], 'data' => $resposta['data'],'code'=>$resposta['code']], $resposta['code']);
+        return $jsonResponse->emitirResposta($response, ["message" => $resposta['message'], 'data' => $resposta['data'], 'code' => $resposta['code']], $resposta['code']);
     }
 
     public function editarUsuario(Request $request, Response $response): Response
     {
         $dadosUsuario = $request->getAttribute('usuario');
         $dadosFormulario = $request->getParsedBody();
+
+    
         $resposta = (new UsuarioService())->editarUsuario($dadosUsuario, $dadosFormulario);
         return (new JsonResponse())->emitirResposta($response, ["message" => $resposta['message'], 'code' => $resposta['code']], $resposta['code']);
     }
@@ -47,6 +49,6 @@ class UsuarioController
         $resposta = (new UsuarioService())->desativar($dadosUsuario->usuario_id);
         $jsonResponse = new JsonResponse();
 
-        return $jsonResponse->emitirResposta($response, ["message" => $resposta['message'],'code'=> $resposta['code']], $resposta['code']);
+        return $jsonResponse->emitirResposta($response, ["message" => $resposta['message'], 'code' => $resposta['code']], $resposta['code']);
     }
 }

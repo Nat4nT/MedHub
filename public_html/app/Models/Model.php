@@ -64,8 +64,8 @@ abstract class Model
         $sql = "UPDATE {$this->table} SET " . implode(', ', $set) . " WHERE {$this->id_column_name} = :id";
         $stmt = $this->conn->prepare($sql);
         $dados['id'] = $this->id;
-        $stmt->execute($dados);
-
+        $stmt->execute(params: $dados);
+        
         return $stmt->rowCount() > 0;
     }
 

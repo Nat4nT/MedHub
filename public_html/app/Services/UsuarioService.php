@@ -154,7 +154,6 @@ class UsuarioService
         ];
     }
 
-
     private function validarCamposPaciente($dados)
     {
         $erro = 0;
@@ -193,31 +192,26 @@ class UsuarioService
         return $dados_usuario;
     }
 
-
     public function realizarCadastro(array $dados = []): array
     {
         $usuarioModel = new UsuarioModel();
         $retonro_erro = [];
 
-        // 1️⃣ Valida se os dados existem
         if (empty($dados)) {
             return ['code' => 401, 'message' => "Dados Inválidos"];
         }
 
-        // 2️⃣ Verifica email duplicado
         if ($usuarioModel->buscarPorEmail($dados["email"] ?? '')) {
             return ['code' => 401, 'message' => "Email já cadastrado!"];
         }
 
         $senhaLogin = $dados['senha'] ?? null;
 
-        // 3️⃣ Prepara dados do usuário
         $dadosUsuario = $this->prepareUserData($dados);
         if (isset($dadosUsuario['error'])) {
             $retonro_erro[] = ['code' => 400, 'message' => $dadosUsuario['message']];
         }
 
-        // 4️⃣ Prepara dados do endereço (se existir)
         if (isset($dados['endereco'])) {
             $dadosEndereco = $this->prepareAddressData(0, $dados['endereco']);
             if (isset($dadosEndereco['error'])) {
@@ -227,7 +221,6 @@ class UsuarioService
             $retonro_erro[] = ['code' => 400, 'message' => 'Endereço não declarado'];
         }
 
-        // 5️⃣ Prepara dados de tipo de usuário
         if (($dados['tipo_usuario'] ?? '') === 'medico') {
             $dadosTipoUsuario = $this->prepareMedicoData(0, $dados);
             if (isset($dadosTipoUsuario['error'])) {
@@ -240,22 +233,18 @@ class UsuarioService
             }
         }
 
-        // 6️⃣ Retorna erros de validação antes de qualquer insert
         if (!empty($retonro_erro)) {
             return ['code' => 400, 'message' => json_encode($retonro_erro)];
         }
 
-        // 7️⃣ Insere usuário
         $idNovoUsuario = $usuarioModel->AddData($dadosUsuario);
         if (!$idNovoUsuario) {
             return ["code" => 500, 'message' => 'Erro ao registrar usuário'];
         }
 
-        // 8️⃣ Insere endereço
         $dadosEndereco = $this->prepareAddressData($idNovoUsuario, $dados['endereco']);
         (new EnderecoModel())->AddData($dadosEndereco);
 
-        // 9️⃣ Insere tipo de usuário
         if (($dados['tipo_usuario'] ?? '') === 'medico') {
             $dadosTipoUsuario = $this->prepareMedicoData($idNovoUsuario, $dados);
             (new MedicoModel())->AddData($dadosTipoUsuario);
@@ -264,7 +253,6 @@ class UsuarioService
             (new PacienteModel())->addData($dadosTipoUsuario);
         }
 
-        // 🔟 Realiza login e retorna token
         $token = (new AutenticacaoService())->realizarLogin($dados['email'], $senhaLogin);
         return ['code' => 200, 'message' => "Cadastro realizado com sucesso", "token" => $token];
     }
@@ -299,22 +287,49 @@ class UsuarioService
     {
         $usuarioId = $dadosSessao->usuario_id;
         $tipoUsuario = $dadosSessao->tipo_usuario;
+        $retonro_erro = [];
 
         $dadosUsuario = $this->prepareUserData($dadosFormulario);
 
         if (isset($dadosFormulario['senha']) && empty($dadosFormulario['senha'])) {
             unset($dadosUsuario['senha']);
         }
-        (new UsuarioModel($usuarioId))->editData($dadosUsuario);
+        if (isset($dadosUsuario['error'])) {
+            $retonro_erro[] = ['code' => 400, 'message' => $dadosUsuario['message']];
+        }
+        if (isset($dados['endereco'])) {
+            $dadosEndereco = $this->prepareAddressData(0, $dadosUsuario['endereco']);
+            if (isset($dadosEndereco['error'])) {
+                $retonro_erro[] = ['code' => 400, 'message' => $dadosEndereco['message']];
+            }
+        } else {
+            $retonro_erro[] = ['code' => 400, 'message' => 'Endereço não declarado'];
+        }
 
-        $dadosEndereco = $this->prepareAddressData($usuarioId, $dadosFormulario['endereco']);
+        if (($dados['tipo_usuario'] ?? '') === 'medico') {
+            $dadosTipoUsuario = $this->prepareMedicoData(0, $dadosUsuario);
+            if (isset($dadosTipoUsuario['error'])) {
+                $retonro_erro[] = ['code' => 400, 'message' => $dadosTipoUsuario['message']];
+            }
+        } else {
+            $dadosTipoUsuario = $this->preparePacienteData(0, $dadosUsuario);
+            if (isset($dadosTipoUsuario['error'])) {
+                $retonro_erro[] = ['code' => 400, 'message' => $dadosTipoUsuario['message']];
+            }
+        }
+
+        if (!empty($retonro_erro)) {
+            return ['code' => 400, 'message' => json_encode($retonro_erro)];
+        }
+
+        (new UsuarioModel($usuarioId))->editData($dadosUsuario);
         (new EnderecoModel($usuarioId))->editData($dadosEndereco);
 
+
         if ($tipoUsuario === 'medico') {
-            $dadosTipoUsuario = $this->prepareMedicoData($usuarioId, $dadosFormulario);
+
             (new MedicoModel($usuarioId))->editData($dadosTipoUsuario);
         } else {
-            $dadosTipoUsuario = $this->preparePacienteData($usuarioId, $dadosFormulario);
             (new PacienteModel($usuarioId))->editData($dadosTipoUsuario);
         }
 
