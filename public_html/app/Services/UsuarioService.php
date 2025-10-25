@@ -270,16 +270,16 @@ class UsuarioService
     }
 
 
-    public function buscarDados(string $tipo): array
+    public function buscarDados( $dadosUsuario): array
     {
-        $dados = (new UsuarioModel())->buscarUsuario($tipo);
+        $dados = (new UsuarioModel($dadosUsuario->usuario_id))->buscarUsuario($dadosUsuario->tipo_usuario);
 
         if ($dados && $dados['status'] == 1) {
-            $coluna = $tipo . '_id';
+            $coluna = $dadosUsuario->tipo_usuario . '_id';
             unset($dados['usuario_id'], $dados[$coluna], $dados['endereco_id']);
 
             $dados['cpf'] = (new Criptografia())->decriptarDado($dados['cpf']);
-
+            
             return [
                 "message" => 'Perfil encontrado',
                 'data' => $dados,

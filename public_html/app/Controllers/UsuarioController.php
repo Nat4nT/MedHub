@@ -29,7 +29,7 @@ class UsuarioController
     public function pegarDadosConta(Request $request, Response $response): Response
     {
         $dadosUsuario = $request->getAttribute('usuario');
-        $resposta = (new UsuarioService())->buscarDados($dadosUsuario->tipo_usuario);
+        $resposta = (new UsuarioService())->buscarDados($dadosUsuario);
         $jsonResponse = new JsonResponse();
         return $jsonResponse->emitirResposta($response, ["message" => $resposta['message'], 'data' => $resposta['data'],'code'=>$resposta['code']], $resposta['code']);
     }

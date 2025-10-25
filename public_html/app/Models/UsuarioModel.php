@@ -19,7 +19,7 @@ class UsuarioModel extends Model
     }
 
     public function buscarUsuario(string $tabela_append){
-        $sql = "SELECT * FROM {$this->table} INNER JOIN {$tabela_append}  ON {$tabela_append}_id = {$this->id_column_name} INNER JOIN endereco USING({$this->id_column_name}) ";
+        $sql = "SELECT * FROM {$this->table} INNER JOIN {$tabela_append}  ON {$tabela_append}_id = {$this->id_column_name} INNER JOIN endereco USING({$this->id_column_name}) WHERE {$this->id_column_name} = {$this->id} AND status = 1";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
