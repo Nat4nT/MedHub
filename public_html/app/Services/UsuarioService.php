@@ -74,27 +74,27 @@ class UsuarioService
     {
         $erro = 0;
         $mensagem = [];
-        if (isset($dados['rua']) || is_null($dados['rua'])) {
+        if (!isset($dados['rua']) || is_null($dados['rua'])) {
             $erro = 1;
             $mensagem['rua'] = 'Campo Rua Invalido';
         }
-        if (isset($dados['bairro']) || is_null($dados['bairro'])) {
+        if (!isset($dados['bairro']) || is_null($dados['bairro'])) {
             $erro = 1;
             $mensagem['bairro'] = 'Campo Bairro Invalido';
         }
-        if (isset($dados['numero']) || is_null($dados['numero'])) {
+        if (!isset($dados['numero']) || is_null($dados['numero'])) {
             $erro = 1;
             $mensagem['numero'] = 'Campo numero Invalido';
         }
-        if (isset($dados['cep']) || is_null($dados['cep'])) {
+        if (!isset($dados['cep']) || is_null($dados['cep'])) {
             $erro = 1;
             $mensagem['cep'] = 'Campo cep Invalido';
         }
-        if (isset($dados['cidade']) || is_null($dados['cidade'])) {
+        if (!isset($dados['cidade']) || is_null($dados['cidade'])) {
             $erro = 1;
             $mensagem['cidade'] = 'Campo cidade Invalido';
         }
-        if (isset($dados['estado']) || is_null($dados['estado'])) {
+        if (!isset($dados['estado']) || is_null($dados['estado'])) {
             $erro = 1;
             $mensagem['estado']  = "Campo estado Invalido";
         }
@@ -127,11 +127,11 @@ class UsuarioService
     {
         $erro = 0;
         $mensagem = [];
-        if (isset($dados['crm']) || is_null($dados['crm'])) {
+        if (!isset($dados['crm']) || is_null($dados['crm'])) {
             $erro = 1;
             $mensagem['crm'] = 'Campo CRM Invalido';
         }
-        if (isset($dados['estado_atuacao']) || is_null($dados['estado_atuacao'])) {
+        if (!isset($dados['estado_atuacao']) || is_null($dados['estado_atuacao'])) {
             $erro = 1;
             $mensagem['estado_atuacao'] = 'Campo Estado de Atuação Invalido';
         }
@@ -160,7 +160,7 @@ class UsuarioService
         $erro = 0;
         $mensagem = [];
 
-        if (isset($dados['data_nascimento']) || is_null($dados['data_nascimento'])) {
+        if (!isset($dados['data_nascimento']) || is_null($dados['data_nascimento'])) {
             $erro = 1;
             $mensagem['data_nascimento'] = "Campo Data de Nascimento Invalido";
         }
@@ -181,11 +181,13 @@ class UsuarioService
         $dados_usuario = [
             'paciente_id' => $usuarioId,
             'data_nascimento' => $dados['data_nascimento'],
-            'peso' => $dados['peso'] ?? null,
-            'altura' => $dados['altura'] ?? null,
-            'desc_deficiencia' => $dados['desc_deficiencia'] ?? null,
-            'tipo_sanguineo' => $dados['tipo_sanguineo'] ?? null,
-            'alergias' => $dados['alergias'] ?? null
+            'peso' => @$dados['peso'] ,
+            'altura' => @$dados['altura'] ,
+            'doencas_diagnosticadas' => @$dados['doencas_diagnosticadas'] ,
+            'desc_deficiencia' => @$dados['desc_deficiencia'] ,
+            'tipo_sanguineo' => @$dados['tipo_sanguineo'] ,
+            'alergias' => @$dados['alergias'] ,
+            'medicacao' => json_encode(@$dados['medicacao']) ,
         ];
 
         return $dados_usuario;
@@ -195,52 +197,78 @@ class UsuarioService
     public function realizarCadastro(array $dados = []): array
     {
         $usuarioModel = new UsuarioModel();
+        $retonro_erro = [];
 
+        // 1️⃣ Valida se os dados existem
         if (empty($dados)) {
             return ['code' => 401, 'message' => "Dados Inválidos"];
         }
+
+        // 2️⃣ Verifica email duplicado
         if ($usuarioModel->buscarPorEmail($dados["email"] ?? '')) {
             return ['code' => 401, 'message' => "Email já cadastrado!"];
         }
 
         $senhaLogin = $dados['senha'] ?? null;
-        $dadosUsuario = $this->prepareUserData($dados);
 
+        // 3️⃣ Prepara dados do usuário
+        $dadosUsuario = $this->prepareUserData($dados);
         if (isset($dadosUsuario['error'])) {
-            return ['code' => 400, 'message' => $dadosUsuario['message']];
+            $retonro_erro[] = ['code' => 400, 'message' => $dadosUsuario['message']];
         }
 
-        $idNovoUsuario = $usuarioModel->AddData($dadosUsuario);
+        // 4️⃣ Prepara dados do endereço (se existir)
+        if (isset($dados['endereco'])) {
+            $dadosEndereco = $this->prepareAddressData(0, $dados['endereco']);
+            if (isset($dadosEndereco['error'])) {
+                $retonro_erro[] = ['code' => 400, 'message' => $dadosEndereco['message']];
+            }
+        } else {
+            $retonro_erro[] = ['code' => 400, 'message' => 'Endereço não declarado'];
+        }
 
+        // 5️⃣ Prepara dados de tipo de usuário
+        if (($dados['tipo_usuario'] ?? '') === 'medico') {
+            $dadosTipoUsuario = $this->prepareMedicoData(0, $dados);
+            if (isset($dadosTipoUsuario['error'])) {
+                $retonro_erro[] = ['code' => 400, 'message' => $dadosTipoUsuario['message']];
+            }
+        } else {
+            $dadosTipoUsuario = $this->preparePacienteData(0, $dados);
+            if (isset($dadosTipoUsuario['error'])) {
+                $retonro_erro[] = ['code' => 400, 'message' => $dadosTipoUsuario['message']];
+            }
+        }
+
+        // 6️⃣ Retorna erros de validação antes de qualquer insert
+        if (!empty($retonro_erro)) {
+            return ['code' => 400, 'message' => json_encode($retonro_erro)];
+        }
+
+        // 7️⃣ Insere usuário
+        $idNovoUsuario = $usuarioModel->AddData($dadosUsuario);
         if (!$idNovoUsuario) {
             return ["code" => 500, 'message' => 'Erro ao registrar usuário'];
         }
 
-        if (isset($dados['endereco'])) {
-            $dadosEndereco = $this->prepareAddressData($idNovoUsuario, $dados['endereco']);
+        // 8️⃣ Insere endereço
+        $dadosEndereco = $this->prepareAddressData($idNovoUsuario, $dados['endereco']);
+        (new EnderecoModel())->AddData($dadosEndereco);
 
-            if (isset($dadosEndereco['error'])) {
-                return ['code' => 400, 'message' => $dadosEndereco['message']];
-            }
-            (new EnderecoModel())->AddData($dadosEndereco);
-        }
-
+        // 9️⃣ Insere tipo de usuário
         if (($dados['tipo_usuario'] ?? '') === 'medico') {
             $dadosTipoUsuario = $this->prepareMedicoData($idNovoUsuario, $dados);
-            if (isset($dadosTipoUsuario['error'])) {
-                return ['code' => 400, 'message' => $dadosTipoUsuario['message']];
-            }
             (new MedicoModel())->AddData($dadosTipoUsuario);
         } else {
             $dadosTipoUsuario = $this->preparePacienteData($idNovoUsuario, $dados);
-            if (isset($dadosTipoUsuario['error'])) {
-                return ['code' => 400, 'message' => $dadosTipoUsuario['message']];
-            }
             (new PacienteModel())->addData($dadosTipoUsuario);
         }
+
+        // 🔟 Realiza login e retorna token
         $token = (new AutenticacaoService())->realizarLogin($dados['email'], $senhaLogin);
         return ['code' => 200, 'message' => "Cadastro realizado com sucesso", "token" => $token];
     }
+
 
     public function buscarDados(string $tipo): array
     {

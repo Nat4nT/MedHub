@@ -20,11 +20,11 @@ return
             ],
             'development' => [
                 'adapter' => 'mysql',
-                'host' => '127.0.0.1',
+                'host' => 'mysql',
                 'name' => 'medhub',
                 'user' => 'developmentMedHub',
                 'pass' => 'dev123',
-                'port' => '53306',
+                'port' => '3306',
                 'charset' => 'utf8mb4'
             ],
             'testing' => [

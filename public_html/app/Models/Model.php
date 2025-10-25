@@ -1,167 +1,118 @@
 <?php
 
 namespace App\Models;
+
 use PDO;
 
 abstract class Model
 {
-    protected $conn;
-    public $id = "0";
-    public $table;
-    public $id_column_name;
+    protected PDO $conn;
+    public $id;
+    protected $table;
+    protected  $id_column_name;
 
-
-    public function __construct($id = 0)
+    public function __construct(int $id = 0)
     {
         $this->id = $id;
         $this->conn = (new DB())->conn();
+        $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
 
-
-    public function getData($append_column = "", $append_table = "", $where = '1=1', $oder_by = false, $sort = 'DESC', $limit = 20): array
+    public function getData(string $where = '1=1', ?string $order_by = null, string $sort = 'DESC', int $limit = 20): array
     {
-        if (!$oder_by) {
-            $oder_by = $this->id_column_name;
-        }
-
-        if (!trim($where)) {
-            $where = '1=1';
-        }
-
-        $sql = "SELECT {$this->table}.* {$append_column} FROM $this->table $append_table WHERE {$where} ORDER BY {$this->table}.$oder_by $sort LIMIT $limit";
+        $order_by = $order_by ?: $this->id_column_name;
+        $sql = "SELECT * FROM {$this->table} WHERE {$where} ORDER BY {$order_by} {$sort} LIMIT :limit";
         $stmt = $this->conn->prepare($sql);
-
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Adiciona ao Banco o dado enviado
-     */
     public function AddData(array $dados): int
     {
-
         if (isset($dados['files'])) {
-            $dados['foto'] = $this->uploadImage($dados['files']);
+            $foto = $this->uploadImage($dados['files']);
+            if ($foto === null) {
+                return 0;
+            }
+            $dados['foto'] = $foto;
             unset($dados['files']);
         }
+
         $colunas = array_keys($dados);
+        $placeholders = array_map(fn($c) => ":$c", $colunas);
 
-        $placeholders = array_map(function ($c) {
-            return ":$c";
-        }, $colunas);
-
-        $sql = "INSERT INTO {$this->table} (" . implode(',', $colunas) . ") 
-            VALUES (" . implode(',', $placeholders) . ")";
-
+        $sql = "INSERT INTO {$this->table} (" . implode(',', $colunas) . ") VALUES (" . implode(',', $placeholders) . ")";
         $stmt = $this->conn->prepare($sql);
-
-        foreach ($dados as $coluna => $valor) {
-            $stmt->bindValue(":$coluna", $valor);
-        }
-
-
-        $stmt->execute();
-        $id = $this->conn->lastInsertId();
-
-        if ($stmt->rowCount()) {
-            return $id;
-        } else {
-            return 0;
-        }
-    }
-
-    public function editData(array $dados)
-    {
-        $params = [];
-        $set = [];
 
         foreach ($dados as $col => $val) {
-            $set[] = "`$col` = :$col";
-            $params[$col] = $val;
+            $stmt->bindValue(":$col", $val);
         }
 
-        $sql = "UPDATE {$this->table} SET " . implode(', ', $set)
-            . " WHERE {$this->id_column_name} = :{$this->id_column_name}";
-
-        $params[$this->id_column_name] = $this->id;
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute($params);
-
-        if ($stmt->rowCount()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public function deleteData(int $id): bool
-    {
-        $ref_column = $this->id_column_name;
-
-        $sql = "DELETE FROM {$this->table} WHERE {$ref_column} = :id";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bindValue(":id", $id ?? $this->id);
         $stmt->execute();
-
-        if ($stmt->rowCount()) {
-            return true;
-        } else {
-            return false;
-        }
+        return (int)$this->conn->lastInsertId();
     }
 
-    /**
-     * Deleta fotos
-     */
-    public function deleteFile(object $object)
+    public function editData(array $dados): bool
     {
-        if (isset($object->foto)) {
+        $set = [];
+        foreach ($dados as $col => $val) {
+            $set[] = "`$col` = :$col";
+        }
+
+        $sql = "UPDATE {$this->table} SET " . implode(', ', $set) . " WHERE {$this->id_column_name} = :id";
+        $stmt = $this->conn->prepare($sql);
+        $dados['id'] = $this->id;
+        $stmt->execute($dados);
+
+        return $stmt->rowCount() > 0;
+    }
+
+    public function deleteData(): bool
+    {
+        $sql = "DELETE FROM {$this->table} WHERE {$this->id_column_name} = :id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(':id', $this->id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->rowCount() > 0;
+    }
+
+    public function deleteFile(object $object): void
+    {
+        if (isset($object->foto) && file_exists(__DIR__ . '/../Views' . $object->foto)) {
             unlink(__DIR__ . '/../Views' . $object->foto);
         }
     }
 
-    /**
-     * Anexando foto a uma pasta local
-     */
-    public function uploadImage(array $file)
+    public function uploadImage(array $files): ?string
     {
-        $table = $this->table;
-        $subdir = explode('_', $table);
-        $subdir = end($subdir);
+        $subdir = end(explode('_', $this->table));
 
-
-        foreach ($file as $foto) {
-
-            // Verifica se veio o arquivo
-            if (!isset($foto['name']) || $foto['error'] !== UPLOAD_ERR_OK) {
-                return false;
+        foreach ($files as $file) {
+            if (!isset($file['name'], $file['tmp_name']) || $file['error'] !== UPLOAD_ERR_OK) {
+                return null;
             }
 
             $uploadDir = __DIR__ . "/../../uploads/{$subdir}/";
+            if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
 
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
-            }
+            $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
-            $extension = pathinfo($foto['name'], PATHINFO_EXTENSION);
-            $filename = uniqid('img_', false) . '.' . strtolower($extension);
+            if (!in_array($extension, $allowedTypes)) return null;
 
+            $mimeType = mime_content_type($file['tmp_name']);
+            if (!str_starts_with($mimeType, 'image/')) return null;
+
+            $filename = uniqid('img_', true) . '.' . $extension;
             $destination = $uploadDir . $filename;
 
-            $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-            if (!in_array(strtolower($extension), $allowedTypes)) {
-                return false;
-            }
-
-            if (move_uploaded_file($foto['tmp_name'], $destination)) {
-
-                // Retorna o link relativo da imagem
-                return '/uploads/' . $subdir . "/" . $filename;
+            if (move_uploaded_file($file['tmp_name'], $destination)) {
+                return '/uploads/' . $subdir . '/' . $filename;
             }
         }
 
-        return false; // Falha no upload
+        return null;
     }
 }

@@ -15,9 +15,9 @@ class LoginController
     public function realizarLogin(Request $request, Response $response): Response
     {
         $data = $request->getParsedBody();
-        $email = $data['email'] ?? '';
-        $password = $data['senha'] ?? '';
-
+        $email = @$data['email'] ;
+        $password = @$data['senha'] ;
+        
         $token = (new AutenticacaoService())->realizarLogin($email, $password);
         $json = new JsonResponse();
 

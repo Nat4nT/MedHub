@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Phinx\Db\Action\AddColumn;
+use Phinx\Db\Adapter\MysqlAdapter;
 use Phinx\Migration\AbstractMigration;
 
 final class CreatePacienteTable extends AbstractMigration
@@ -14,7 +14,7 @@ final class CreatePacienteTable extends AbstractMigration
             "id" => false,
             "primary_key" => ['paciente_id']
         ]);
-        $table->addColumn('paciente_id', 'integer', ['signed' => false,'null'=>false])
+        $table->addColumn('paciente_id', 'integer', ['signed' => false, 'null' => false])
             ->addColumn('data_nascimento', 'date', ['null' => false])
             ->AddColumn('peso', 'decimal', ['precision' => 5, 'scale' => 2, 'null' => true, 'default' => null])
             ->AddColumn('altura', 'decimal', ['precision' => 3, 'scale' => 2, 'null' => true, 'default' => null])
@@ -22,6 +22,7 @@ final class CreatePacienteTable extends AbstractMigration
             ->addColumn('tipo_sanguineo', 'enum', ['values' => ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'], 'default' => null])
             ->addColumn('alergias', 'string', ['limit' => 500, 'default' => null])
             ->addColumn('doencas_diagnosticadas', 'string', ['limit' => 500, 'default' => null])
+            ->addColumn('medicacao', 'text', ['limit' => MysqlAdapter::TEXT_LONG,'default'=> null])
             ->addForeignKey('paciente_id', 'usuario', 'usuario_id', [
                 'delete' => 'CASCADE',
                 'update' => 'NO_ACTION'
