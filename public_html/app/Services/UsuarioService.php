@@ -221,7 +221,7 @@ class UsuarioService
             $retonro_erro[] = ['code' => 400, 'message' => 'Endereço não declarado'];
         }
 
-        if (($dados['tipo_usuario'] ?? '') === 'medico') {
+        if (($dados['tipo_usuario'] ) === 'medico') {
             $dadosTipoUsuario = $this->prepareMedicoData(0, $dados);
             if (isset($dadosTipoUsuario['error'])) {
                 $retonro_erro[] = ['code' => 400, 'message' => $dadosTipoUsuario['message']];
@@ -245,7 +245,7 @@ class UsuarioService
         $dadosEndereco = $this->prepareAddressData($idNovoUsuario, $dados['endereco']);
         (new EnderecoModel())->AddData($dadosEndereco);
 
-        if (($dados['tipo_usuario'] ?? '') === 'medico') {
+        if (($dados['tipo_usuario']) === 'medico') {
             $dadosTipoUsuario = $this->prepareMedicoData($idNovoUsuario, $dados);
             (new MedicoModel())->AddData($dadosTipoUsuario);
         } else {
@@ -297,8 +297,8 @@ class UsuarioService
         if (isset($dadosUsuario['error'])) {
             $retonro_erro[] = ['code' => 400, 'message' => $dadosUsuario['message']];
         }
-        if (isset($dados['endereco'])) {
-            $dadosEndereco = $this->prepareAddressData(0, $dadosUsuario['endereco']);
+        if (isset($dadosFormulario['endereco'])) {
+            $dadosEndereco = $this->prepareAddressData($usuarioId, $dadosFormulario['endereco']);
             if (isset($dadosEndereco['error'])) {
                 $retonro_erro[] = ['code' => 400, 'message' => $dadosEndereco['message']];
             }
@@ -306,13 +306,13 @@ class UsuarioService
             $retonro_erro[] = ['code' => 400, 'message' => 'Endereço não declarado'];
         }
 
-        if (($dados['tipo_usuario'] ?? '') === 'medico') {
-            $dadosTipoUsuario = $this->prepareMedicoData(0, $dadosUsuario);
+        if (($dadosFormulario['tipo_usuario']) === 'medico') {
+            $dadosTipoUsuario = $this->prepareMedicoData($usuarioId, $dadosFormulario);
             if (isset($dadosTipoUsuario['error'])) {
                 $retonro_erro[] = ['code' => 400, 'message' => $dadosTipoUsuario['message']];
             }
         } else {
-            $dadosTipoUsuario = $this->preparePacienteData(0, $dadosUsuario);
+            $dadosTipoUsuario = $this->preparePacienteData($usuarioId, $dadosFormulario);
             if (isset($dadosTipoUsuario['error'])) {
                 $retonro_erro[] = ['code' => 400, 'message' => $dadosTipoUsuario['message']];
             }
