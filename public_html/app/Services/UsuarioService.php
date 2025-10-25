@@ -181,13 +181,13 @@ class UsuarioService
         $dados_usuario = [
             'paciente_id' => $usuarioId,
             'data_nascimento' => $dados['data_nascimento'],
-            'peso' => @$dados['peso'] ,
-            'altura' => @$dados['altura'] ,
-            'doencas_diagnosticadas' => @$dados['doencas_diagnosticadas'] ,
-            'desc_deficiencia' => @$dados['desc_deficiencia'] ,
-            'tipo_sanguineo' => @$dados['tipo_sanguineo'] ,
-            'alergias' => @$dados['alergias'] ,
-            'medicacao' => json_encode(@$dados['medicacao']) ,
+            'peso' => @$dados['peso'],
+            'altura' => @$dados['altura'],
+            'doencas_diagnosticadas' => isset($dados['doencas_diagnosticadas']) ? json_encode(@$dados['doencas_diagnosticadas']) : null,
+            'desc_deficiencia' => @$dados['desc_deficiencia'],
+            'tipo_sanguineo' => @$dados['tipo_sanguineo'],
+            'alergias' => isset($dados['alergias']) ? json_encode(@$dados['alergias']) : null,
+            'medicacao' => isset($dados['medicacao']) ? json_encode(@$dados['medicacao']) : null,
         ];
 
         return $dados_usuario;
@@ -270,7 +270,7 @@ class UsuarioService
     }
 
 
-    public function buscarDados( $dadosUsuario): array
+    public function buscarDados($dadosUsuario): array
     {
         $dados = (new UsuarioModel($dadosUsuario->usuario_id))->buscarUsuario($dadosUsuario->tipo_usuario);
 
@@ -279,7 +279,7 @@ class UsuarioService
             unset($dados['usuario_id'], $dados[$coluna], $dados['endereco_id']);
 
             $dados['cpf'] = (new Criptografia())->decriptarDado($dados['cpf']);
-            
+
             return [
                 "message" => 'Perfil encontrado',
                 'data' => $dados,
