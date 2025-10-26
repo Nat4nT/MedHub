@@ -4,18 +4,19 @@ declare(strict_types=1);
 
 use Phinx\Migration\AbstractMigration;
 
-final class CreateTableCondicao extends AbstractMigration
+final class CreateTableCategoria extends AbstractMigration
 {
 
     public function change(): void
     {
-        $tableName = "condicao";
+        $tableName = "categoria";
         if ($this->hasTable($tableName)) {
             $this->table($tableName)->drop()->save();
         }
-        $table = $this->table($tableName,['id'=>'condicao_id']);
+        $table = $this->table($tableName,['id'=>'categoria_id']);
         $table->addColumn('nome','string',['limit'=> 255,'null'=> false])
-        ->addColumn('tipo','enum',['values'=>['alergia','doenca','deficiencia']])
+        ->addColumn('usuario_id','integer',['limit'=> 11,'signed'=> false])
+        ->addColumn('sis_cat','boolean',['default'=>0])
         ->addTimestamps('data_criacao', 'data_atualizacao')
         ->create();
 

@@ -10,7 +10,11 @@ final class CreatePacienteTable extends AbstractMigration
 
     public function change(): void
     {
-        $table = $this->table("paciente", [
+        $tableName = "paciente";
+        if ($this->hasTable($tableName)) {
+            $this->table($tableName)->drop()->save();
+        }
+        $table = $this->table($tableName, [
             "id" => false,
             "primary_key" => ['paciente_id']
         ]);
@@ -23,6 +27,7 @@ final class CreatePacienteTable extends AbstractMigration
             ->addColumn('alergias', 'string', ['limit' => 500, 'default' => null])
             ->addColumn('doencas_diagnosticadas', 'string', ['limit' => 500, 'default' => null])
             ->addColumn('medicacao', 'text', ['limit' => MysqlAdapter::TEXT_LONG,'default'=> null])
+
             ->addForeignKey('paciente_id', 'usuario', 'usuario_id', [
                 'delete' => 'CASCADE',
                 'update' => 'NO_ACTION'

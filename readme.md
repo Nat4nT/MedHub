@@ -1,6 +1,7 @@
-criar bancos : 
-    docker exec -it medihub public_html/vendor/bin/phinx migrate -e development
+levantar ambiente
+docker compose up --build
 
-levantar ambiente 
+criar bancos :
+docker exec -it medihub bash -c "vendor/bin/phinx migrate -e development && vendor/bin/phinx seed:run -e development"
 
-docker compose up
+

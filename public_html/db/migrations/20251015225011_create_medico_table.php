@@ -8,7 +8,11 @@ final class CreateMedicoTable extends AbstractMigration
 {
     public function change(): void
     {
-        $table = $this->table('medico', [
+        $tableName = "medico";
+        if ($this->hasTable($tableName)) {
+            $this->table($tableName)->drop()->save();
+        }
+        $table = $this->table($tableName, [
             'id' => false,
             'primary_key' => ['medico_id']
         ]);

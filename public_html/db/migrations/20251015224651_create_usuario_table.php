@@ -9,7 +9,11 @@ final class CreateUsuarioTable extends AbstractMigration
 {
     public function change(): void
     {
-        $table = $this->table('usuario', ['id' => 'usuario_id']);
+        $tableName = "usuario";
+        if ($this->hasTable($tableName)) {
+            $this->table($tableName)->drop()->save();
+        }
+        $table = $this->table($tableName, ['id' => 'usuario_id']);
 
         $table->addColumn('tipo_usuario', 'enum', ['values' => ['paciente', 'medico']])
             ->addColumn('primeiro_nome', 'string', ['limit' => 100])
@@ -23,6 +27,6 @@ final class CreateUsuarioTable extends AbstractMigration
             ->addColumn('consentimento_lgpd', 'boolean', ['default' => false])
             ->addColumn('status', 'boolean', ['default'=> true])
             ->addIndex(['email'], ['unique' => true]) 
-            ->addTimestamps()->create();
+            ->addTimestamps('data_criacao', 'data_atualizacao')->create();
     }
 }

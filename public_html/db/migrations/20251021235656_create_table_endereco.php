@@ -7,8 +7,13 @@ class CreateTableEndereco extends AbstractMigration
 {
     public function change()
     {
-        $table = $this->table('endereco', ['id' => 'endereco_id']);
 
+        $tableName = "endereco";
+        if ($this->hasTable($tableName)) {
+            $this->table($tableName)->drop()->save();
+        }
+        
+        $table = $this->table($tableName, ['id' => 'endereco_id']);
         $table
             ->addColumn('usuario_id', 'integer', ['limit' => 11, 'signed' => false])
             ->addColumn('cep', 'string', ['limit' => 9])
@@ -23,7 +28,7 @@ class CreateTableEndereco extends AbstractMigration
                     'PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'
                 ]
             ])
-            ->addTimestamps()
+            ->addTimestamps('data_criacao', 'data_atualizacao')
             ->addForeignKey('usuario_id', 'usuario', 'usuario_id', [
                 'delete' => 'CASCADE',
                 'update' => 'CASCADE'
