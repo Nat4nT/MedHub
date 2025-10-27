@@ -22,7 +22,8 @@ class AutenticacaoService
                 'usuario_id' => $usuario->usuario_id,
                 'tipo_usuario' => $usuario->tipo_usuario
             ]),
-            'name'=> $usuario->primeiro_nome ." ". $usuario->ultimo_nome,
+            'firstname' => $usuario->primeiro_nome,
+            'lastname' => $usuario->ultimo_nome,
         ];
 
         return $data;

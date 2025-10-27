@@ -23,7 +23,7 @@ class UsuarioController
         $resposta = (new UsuarioService())->realizarCadastro($data);
 
 
-        return $jsonResponse->emitirResposta($response, ["message" => $resposta['message'], "data" => ['token' => @$resposta['token'],'user'=>@$resposta['user']], 'code' => $resposta['code']], $resposta['code']);
+        return $jsonResponse->emitirResposta($response, ["message" => $resposta['message'], "data" => ['token' => @$resposta['token'], 'firstname' => @$resposta['firstname'], 'lastname' => @$resposta['lastname']], 'code' => $resposta['code']], $resposta['code']);
     }
 
     public function pegarDadosConta(Request $request, Response $response): Response
@@ -39,7 +39,7 @@ class UsuarioController
         $dadosUsuario = $request->getAttribute('usuario');
         $dadosFormulario = $request->getParsedBody();
 
-    
+
         $resposta = (new UsuarioService())->editarUsuario($dadosUsuario, $dadosFormulario);
         return (new JsonResponse())->emitirResposta($response, ["message" => $resposta['message'], 'code' => $resposta['code']], $resposta['code']);
     }

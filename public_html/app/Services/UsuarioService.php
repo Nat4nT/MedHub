@@ -221,7 +221,7 @@ class UsuarioService
             $retonro_erro[] = ['code' => 400, 'message' => 'Endereço não declarado'];
         }
 
-        if (($dados['tipo_usuario'] ) === 'medico') {
+        if (($dados['tipo_usuario']) === 'medico') {
             $dadosTipoUsuario = $this->prepareMedicoData(0, $dados);
             if (isset($dadosTipoUsuario['error'])) {
                 $retonro_erro[] = ['code' => 400, 'message' => $dadosTipoUsuario['message']];
@@ -254,7 +254,7 @@ class UsuarioService
         }
 
         $data = (new AutenticacaoService())->realizarLogin($dados['email'], $senhaLogin);
-        return ['code' => 200, 'message' => "Cadastro realizado com sucesso", "token" => $data['token'],'user'=>$data['name']];
+        return ['code' => 200, 'message' => "Cadastro realizado com sucesso", "token" => $data['token'], 'firstname' => $data['firstname'], 'lastname' => $data['lastname']];
     }
 
 

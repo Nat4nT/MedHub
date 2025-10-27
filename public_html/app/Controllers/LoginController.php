@@ -15,9 +15,9 @@ class LoginController
     public function realizarLogin(Request $request, Response $response): Response
     {
         $data = $request->getParsedBody();
-        $email = @$data['email'] ;
-        $password = @$data['senha'] ;
-        
+        $email = @$data['email'];
+        $password = @$data['senha'];
+
         $data = (new AutenticacaoService())->realizarLogin($email, senha: $password);
         $json = new JsonResponse();
 
@@ -30,7 +30,8 @@ class LoginController
             'message' => 'Login realizado com sucesso',
             'data' => [
                 'token' => $data['token'],
-                'user'=> $data['name']
+                'firstname' => $data['firstname'],
+                'lastname' => $data['lastname']
             ],
             'code' => 200
         ];
