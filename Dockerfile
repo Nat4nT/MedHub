@@ -10,4 +10,4 @@ RUN chown -R www-data:www-data /var/www/html
 
 EXPOSE 80
 
-CMD bash -c "vendor/bin/phinx migrate -e development && vendor/bin/phinx seed:run -e development && apache2-foreground"
+CMD ["apache2-foreground"]

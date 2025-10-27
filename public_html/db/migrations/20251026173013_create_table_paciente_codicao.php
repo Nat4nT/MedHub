@@ -16,7 +16,7 @@ final class CreateTablePacienteCodicao extends AbstractMigration
         $table = $this->table($tableName, ["id" => 'paciente_condicao_id']);
         $table->addColumn('paciente_id', 'integer', ['limit' => 11, 'signed' => false])
             ->addColumn('condicao_id', 'integer', ['limit' => 11, 'signed' => false])
-            ->addForeignKey('paciente_id', 'usuario', 'usuario_id', [
+            ->addForeignKey('paciente_id', 'paciente', 'paciente_id', [
                 'delete' => 'CASCADE',
                 'update' => 'NO_ACTION'
             ])

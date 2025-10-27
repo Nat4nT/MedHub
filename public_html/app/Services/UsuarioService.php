@@ -253,8 +253,8 @@ class UsuarioService
             (new PacienteModel())->addData($dadosTipoUsuario);
         }
 
-        $token = (new AutenticacaoService())->realizarLogin($dados['email'], $senhaLogin);
-        return ['code' => 200, 'message' => "Cadastro realizado com sucesso", "token" => $token];
+        $data = (new AutenticacaoService())->realizarLogin($dados['email'], $senhaLogin);
+        return ['code' => 200, 'message' => "Cadastro realizado com sucesso", "token" => $data['token'],'user'=>$data['name']];
     }
 
 

@@ -18,10 +18,10 @@ class LoginController
         $email = @$data['email'] ;
         $password = @$data['senha'] ;
         
-        $token = (new AutenticacaoService())->realizarLogin($email, $password);
+        $data = (new AutenticacaoService())->realizarLogin($email, senha: $password);
         $json = new JsonResponse();
 
-        if (!$token) {
+        if (!isset($data['token'])) {
             return $json->emitirResposta($response, ['message' => 'Login inválido', 'data' => [], 'code' => 401], 401);
         }
 
@@ -29,7 +29,8 @@ class LoginController
         $data = [
             'message' => 'Login realizado com sucesso',
             'data' => [
-                'token' => $token
+                'token' => $data['token'],
+                'user'=> $data['name']
             ],
             'code' => 200
         ];
