@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace Api\Models;
 
 use PDO;
 
@@ -19,15 +19,34 @@ abstract class Model
     }
 
 
-    public function getData(string $where = '1=1', ?string $order_by = null, string $sort = 'DESC', int $limit = 20): array
+    public function getData(array $options = []): array
     {
-        $order_by = $order_by ?: $this->id_column_name;
-        $sql = "SELECT * FROM {$this->table} WHERE {$where} ORDER BY {$order_by} {$sort} LIMIT :limit";
+        $defaults = [
+            'where' => '1=1',
+            'order_by' => $this->id_column_name,
+            'sort' => 'DESC',
+            'limit' => null,
+        ];
+
+        $params = array_merge($defaults, $options);
+
+        $sql = "SELECT * FROM {$this->table} WHERE {$params['where']} ORDER BY {$params['order_by']} {$params['sort']}";
+
+        if (!empty($params['limit']) && is_numeric($params['limit'])) {
+            $sql .= " LIMIT :limit";
+        }
+
         $stmt = $this->conn->prepare($sql);
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+
+        if (!empty($params['limit']) && is_numeric($params['limit'])) {
+            $stmt->bindValue(':limit', (int)$params['limit'], PDO::PARAM_INT);
+        }
+
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+
 
     public function AddData(array $dados): int
     {
@@ -65,7 +84,7 @@ abstract class Model
         $stmt = $this->conn->prepare($sql);
         $dados['id'] = $this->id;
         $stmt->execute(params: $dados);
-        
+
         return $stmt->rowCount() > 0;
     }
 
@@ -75,7 +94,7 @@ abstract class Model
         $stmt = $this->conn->prepare($sql);
         $stmt->bindValue(':id', $this->id, PDO::PARAM_INT);
         $stmt->execute();
-        return $stmt->rowCount() > 0;
+        return $stmt->rowCount();
     }
 
     public function deleteFile(object $object): void

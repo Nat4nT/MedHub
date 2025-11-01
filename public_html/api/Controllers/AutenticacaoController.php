@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Controllers;
+namespace Api\Controllers;
 
-use App\Helpers\Token;
+use Api\Helpers\Token;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 

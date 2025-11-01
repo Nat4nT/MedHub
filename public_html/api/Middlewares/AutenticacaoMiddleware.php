@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Middlewares;
+namespace Api\Middlewares;
 
-use App\Helpers\Token;
+use Api\Helpers\Token;
 use Exception;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\MiddlewareInterface;

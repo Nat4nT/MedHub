@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Controllers;
+namespace Api\Controllers;
 
-use App\Services\UsuarioService;
-use App\Helpers\JsonResponse;
+use Api\Services\UsuarioService;
+use Api\Helpers\JsonResponse;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 

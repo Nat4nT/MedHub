@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace Api\Models;
 
 class EnderecoModel extends Model
 {

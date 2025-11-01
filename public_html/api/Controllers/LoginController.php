@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Controllers;
+namespace Api\Controllers;
 
-use App\Helpers\JsonResponse;
-use App\Models\UsuarioModel;
-use App\Services\AutenticacaoService;
+use Api\Helpers\JsonResponse;
+use Api\Services\AutenticacaoService;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -23,6 +22,10 @@ class LoginController
 
         if (!isset($data['token'])) {
             return $json->emitirResposta($response, ['message' => 'Login inválido', 'data' => [], 'code' => 401], 401);
+        }
+
+        if ($data['status'] == 0) {
+            return $json->emitirResposta($response, ['message' => 'Conta Inativa', 'data' => [], 'code' => 401], 401);
         }
 
 

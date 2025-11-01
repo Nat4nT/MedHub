@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Services;
+namespace Api\Services;
 
-use App\Helpers\Criptografia;
-use App\Models\EnderecoModel;
-use App\Models\MedicoModel;
-use App\Models\PacienteModel;
-use App\Models\UsuarioModel;
-use App\Services\AutenticacaoService;
+use Api\Helpers\Criptografia;
+use Api\Models\EnderecoModel;
+use Api\Models\MedicoModel;
+use Api\Models\PacienteModel;
+use Api\Models\UsuarioModel;
+use Api\Services\AutenticacaoService;
 
 
 class UsuarioService
@@ -40,7 +40,7 @@ class UsuarioService
         return ["erro" => $erro, "mensagem" => $mensagem];
     }
 
-    private function prepareUserData(array $dados): array
+    private function prepareUserData(array $dados, $is_logged = 0): array
     {
 
         $validacao = $this->validarCamposUsuario($dados);
@@ -49,16 +49,30 @@ class UsuarioService
             return ["message" => $validacao['mensagem'], 'error' => 1];
         }
 
-        $dadosUsuario = [
-            'tipo_usuario' => $dados['tipo_usuario'],
-            "primeiro_nome" => $dados["primeiro_nome"],
-            'ultimo_nome' => $dados['ultimo_nome'],
-            'genero' => $dados['genero'] ?? 3,
-            'cpf' => (new Criptografia())->encriptarDado($dados['cpf']),
-            'telefone' => $dados['telefone'] ?? null,
-            'email' => $dados['email'],
-            'consentimento_lgpd' => $dados['consentimento_lgpd'] ?? 0
-        ];
+        if ($is_logged) {
+            $dadosUsuario = [
+                "primeiro_nome" => $dados["primeiro_nome"],
+                'ultimo_nome' => $dados['ultimo_nome'] ,
+                'genero' => $dados['genero'] ?? 3,
+                'telefone' => $dados['telefone'] ?? null,
+                'email' => $dados['email'],
+                'consentimento_lgpd' => $dados['consentimento_lgpd'] ?? 0
+            ];
+        } else {
+            $dadosUsuario = [
+                'tipo_usuario' => $dados['tipo_usuario'],
+                "primeiro_nome" => $dados["primeiro_nome"],
+                'ultimo_nome' => $dados['ultimo_nome'],
+                'genero' => $dados['genero'] ?? 3,
+                'cpf' => (new Criptografia())->encriptarDado($dados['cpf']),
+                'telefone' => $dados['telefone'] ?? null,
+                'email' => $dados['email'],
+                'consentimento_lgpd' => $dados['consentimento_lgpd'] ?? 0
+            ];
+        }
+
+
+
 
         if (isset($dados['imagem_perfil']) && !is_null($dados['imagem_perfil'])) {
             $dadosUsuario['files'] = $dados['imagem_perfil'];
@@ -289,7 +303,7 @@ class UsuarioService
         $tipoUsuario = $dadosSessao->tipo_usuario;
         $retonro_erro = [];
 
-        $dadosUsuario = $this->prepareUserData($dadosFormulario);
+        $dadosUsuario = $this->prepareUserData($dadosFormulario,$usuarioId);
 
         if (isset($dadosFormulario['senha']) && empty($dadosFormulario['senha'])) {
             unset($dadosUsuario['senha']);
@@ -358,7 +372,7 @@ class UsuarioService
         } else {
             return [
                 "message" => 'Erro ao inativar perfil',
-                'code' => 200
+                'code' => 300
             ];
         }
     }

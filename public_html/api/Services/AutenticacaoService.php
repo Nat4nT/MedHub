@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Services;
+namespace Api\Services;
 
-use App\Helpers\Token;
-use App\Models\UsuarioModel;
+use Api\Helpers\Token;
+use Api\Models\UsuarioModel;
 
 class AutenticacaoService
 {
@@ -24,6 +24,7 @@ class AutenticacaoService
             ]),
             'firstname' => $usuario->primeiro_nome,
             'lastname' => $usuario->ultimo_nome,
+            'status'=> $usuario->status
         ];
 
         return $data;
