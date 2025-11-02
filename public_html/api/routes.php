@@ -3,6 +3,7 @@
 use Api\Controllers\LoginController;
 use Api\Controllers\UsuarioController;
 use Api\Controllers\CategoriaController;
+use Api\Controllers\ExameController;
 use Api\Middlewares\AutenticacaoMiddleware;
 use Slim\App;
 
@@ -21,14 +22,17 @@ return function (App $app) {
         $user->post('/deletar', [UsuarioController::class, 'desativarPerfil']);
     })->add(AutenticacaoMiddleware::class);
 
-    $app->group('/exame', function ($exame) {
-        
-    });
+  
 
     $app->group('/categoria', function ($cat) {
         $cat->get('', [CategoriaController::class, 'index']);
         $cat->post('', [CategoriaController::class, 'create']);
         $cat->post('/deletar', [CategoriaController::class, 'delete']);
+    })->add(AutenticacaoMiddleware::class);
+
+    $app->group('/exames', function ($exam) {
+        $exam->get('', [ExameController::class,'index']);
+        $exam->post('/adicionar', [ExameController::class,'create']);
     })->add(AutenticacaoMiddleware::class);
 
     $app->post('/teste', function ($request, $response) {

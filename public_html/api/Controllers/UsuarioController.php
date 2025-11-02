@@ -15,7 +15,7 @@ class UsuarioController
     {
         $data = $request->getParsedBody();
         $uploadedFiles = $request->getUploadedFiles();
-        $data['imagem_perfil'] = $uploadedFiles;
+        $data['files'] = $uploadedFiles;
         $jsonResponse = new JsonResponse();
 
         if (is_null($data) || empty($data) || !isset($data['consentimento_lgpd']) || $data['consentimento_lgpd'] == 0) {

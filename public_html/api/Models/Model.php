@@ -59,7 +59,7 @@ abstract class Model
 
     public function AddData(array $dados): int
     {
-        $imageFields = ['imagem_perfil', 'imagem_exame'];
+        $imageFields = ['imagem_perfil', 'arquivo_exame'];
         $uploadedFiles = $dados['files'] ?? [];
 
         unset($dados['files']);
