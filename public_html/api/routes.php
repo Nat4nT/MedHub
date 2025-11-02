@@ -21,6 +21,9 @@ return function (App $app) {
         $user->post('/deletar', [UsuarioController::class, 'desativarPerfil']);
     })->add(AutenticacaoMiddleware::class);
 
+    $app->group('/exame', function ($exame) {
+        
+    });
 
     $app->group('/categoria', function ($cat) {
         $cat->get('', [CategoriaController::class, 'index']);

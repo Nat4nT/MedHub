@@ -34,7 +34,8 @@ class LoginController
             'data' => [
                 'token' => $data['token'],
                 'firstname' => $data['firstname'],
-                'lastname' => $data['lastname']
+                'lastname' => $data['lastname'],
+                "user_photo" => $data["imagem_perfil"],
             ],
             'code' => 200
         ];

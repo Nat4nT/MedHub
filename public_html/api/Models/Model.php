@@ -2,6 +2,8 @@
 
 namespace Api\Models;
 
+use Psr\Http\Message\UploadedFileInterface; // Necessário para a tipagem
+
 use PDO;
 
 abstract class Model
@@ -18,6 +20,15 @@ abstract class Model
         $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
+
+    public function getInfo()
+    {
+        $sql = "SELECT * FROM {$this->table} WHERE {$this->id_column_name} =:id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(':id', $this->id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 
     public function getData(array $options = []): array
     {
@@ -46,17 +57,26 @@ abstract class Model
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-
-
     public function AddData(array $dados): int
     {
-        if (isset($dados['files'])) {
-            $foto = $this->uploadImage($dados['files']);
-            if ($foto === null) {
-                return 0;
+        $imageFields = ['imagem_perfil', 'imagem_exame'];
+        $uploadedFiles = $dados['files'] ?? [];
+
+        unset($dados['files']);
+
+        foreach ($imageFields as $fieldName) {
+            if (isset($uploadedFiles[$fieldName])) {
+                $fileObject = $uploadedFiles[$fieldName];
+                if ($fileObject->getError() === UPLOAD_ERR_OK) {
+                    $fotoCaminho = $this->uploadImage($fileObject);
+                    if ($fotoCaminho !== null) {
+
+                        $dados[$fieldName] = $fotoCaminho;
+                    } else {
+                        unset($dados[$fieldName]);
+                    }
+                }
             }
-            $dados['foto'] = $foto;
-            unset($dados['files']);
         }
 
         $colunas = array_keys($dados);
@@ -75,6 +95,34 @@ abstract class Model
 
     public function editData(array $dados): bool
     {
+        $imageFields = ['imagem_perfil', 'imagem_exame'];
+        $uploadedFiles = $dados['files'] ?? [];
+        unset($dados['files']);
+
+
+        foreach ($imageFields as $fieldName) {
+            $fileObject = $uploadedFiles[$fieldName] ?? null;
+
+            if ($fileObject && $fileObject->getError() === UPLOAD_ERR_OK) {
+
+                $currentData = $this->getInfo();
+                if (isset($currentData[$fieldName]) && $currentData[$fieldName]) {
+                    $this->deleteFile($currentData[$fieldName]);
+                }
+
+                $uploadResult = $this->uploadImage($fileObject);
+
+                if ($uploadResult === null) {
+
+                    unset($dados[$fieldName]);
+                } else {
+                    $dados[$fieldName] = $uploadResult;
+                }
+            } else {
+                unset($dados[$fieldName]);
+            }
+        }
+
         $set = [];
         foreach ($dados as $col => $val) {
             $set[] = "`$col` = :$col";
@@ -85,11 +133,19 @@ abstract class Model
         $dados['id'] = $this->id;
         $stmt->execute(params: $dados);
 
-        return $stmt->rowCount() > 0;
+        return $stmt->rowCount();
     }
 
     public function deleteData(): bool
     {
+        $data = $this->getInfo();
+        $file_field = ['imagem_exame', 'imagem_perfil'];
+        foreach ($file_field as $file) {
+            if (isset($data[$file])) {
+                $this->deleteFile($data[$file]);
+            }
+        }
+
         $sql = "DELETE FROM {$this->table} WHERE {$this->id_column_name} = :id";
         $stmt = $this->conn->prepare($sql);
         $stmt->bindValue(':id', $this->id, PDO::PARAM_INT);
@@ -97,41 +153,40 @@ abstract class Model
         return $stmt->rowCount();
     }
 
-    public function deleteFile(object $object): void
+    public function deleteFile($arquivo): void
     {
-        if (isset($object->foto) && file_exists(__DIR__ . '/../Views' . $object->foto)) {
-            unlink(__DIR__ . '/../Views' . $object->foto);
-        }
+        unlink(__DIR__ . '/../../' . $arquivo);
     }
 
-    public function uploadImage(array $files): ?string
+    public function uploadImage(UploadedFileInterface $fileObject): ?string // Mudança: Recebe o objeto
     {
-        $subdir = end(explode('_', $this->table));
 
-        foreach ($files as $file) {
-            if (!isset($file['name'], $file['tmp_name']) || $file['error'] !== UPLOAD_ERR_OK) {
-                return null;
-            }
-
-            $uploadDir = __DIR__ . "/../../uploads/{$subdir}/";
-            if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
-
-            $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-            $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-
-            if (!in_array($extension, $allowedTypes)) return null;
-
-            $mimeType = mime_content_type($file['tmp_name']);
-            if (!str_starts_with($mimeType, 'image/')) return null;
-
-            $filename = uniqid('img_', true) . '.' . $extension;
-            $destination = $uploadDir . $filename;
-
-            if (move_uploaded_file($file['tmp_name'], $destination)) {
-                return '/uploads/' . $subdir . '/' . $filename;
-            }
+        if ($fileObject->getError() !== UPLOAD_ERR_OK) {
+            return null;
         }
+        $tableParts = explode('_', $this->table);
+        $subdir = end($tableParts);
+        $uploadDir = __DIR__ . "/../../uploads/{$subdir}/";
+        if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
 
-        return null;
+
+        $clientFilename = $fileObject->getClientFilename();
+        $extension = strtolower(pathinfo($clientFilename, PATHINFO_EXTENSION));
+        $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+        if (!in_array($extension, $allowedTypes)) return null;
+
+
+        $filename = uniqid('img_', true) . '.' . $extension;
+        $destination = $uploadDir . $filename;
+
+
+        try {
+            $fileObject->moveTo($destination);
+            return '/uploads/' . $subdir . '/' . $filename;
+        } catch (\Throwable $e) {
+
+            return null;
+        }
     }
 }

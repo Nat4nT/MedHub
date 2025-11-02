@@ -24,7 +24,8 @@ class AutenticacaoService
             ]),
             'firstname' => $usuario->primeiro_nome,
             'lastname' => $usuario->ultimo_nome,
-            'status'=> $usuario->status
+            'imagem_perfil' => $usuario->imagem_perfil,
+            'status' => $usuario->status
         ];
 
         return $data;

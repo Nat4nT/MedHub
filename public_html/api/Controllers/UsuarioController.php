@@ -14,6 +14,8 @@ class UsuarioController
 
     {
         $data = $request->getParsedBody();
+        $uploadedFiles = $request->getUploadedFiles();
+        $data['imagem_perfil'] = $uploadedFiles;
         $jsonResponse = new JsonResponse();
 
         if (is_null($data) || empty($data) || !isset($data['consentimento_lgpd']) || $data['consentimento_lgpd'] == 0) {
@@ -23,7 +25,7 @@ class UsuarioController
         $resposta = (new UsuarioService())->realizarCadastro($data);
 
 
-        return $jsonResponse->emitirResposta($response, ["message" => $resposta['message'], "data" => ['token' => @$resposta['token'], 'firstname' => @$resposta['firstname'], 'lastname' => @$resposta['lastname']], 'code' => $resposta['code']], $resposta['code']);
+        return $jsonResponse->emitirResposta($response, ["message" => $resposta['message'], "data" => ['token' => @$resposta['token'], 'firstname' => @$resposta['firstname'], 'lastname' => @$resposta['lastname'], 'user_photo' => @$resposta['user_photo']], 'code' => $resposta['code']], $resposta['code']);
     }
 
     public function pegarDadosConta(Request $request, Response $response): Response
@@ -38,6 +40,8 @@ class UsuarioController
     {
         $dadosUsuario = $request->getAttribute('usuario');
         $dadosFormulario = $request->getParsedBody();
+        $uploadedFiles = $request->getUploadedFiles();
+        $dadosFormulario['imagem_perfil'] = $uploadedFiles;
 
 
         $resposta = (new UsuarioService())->editarUsuario($dadosUsuario, $dadosFormulario);

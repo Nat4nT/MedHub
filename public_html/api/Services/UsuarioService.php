@@ -268,7 +268,7 @@ class UsuarioService
         }
 
         $data = (new AutenticacaoService())->realizarLogin($dados['email'], $senhaLogin);
-        return ['code' => 200, 'message' => "Cadastro realizado com sucesso", "token" => $data['token'], 'firstname' => $data['firstname'], 'lastname' => $data['lastname']];
+        return ['code' => 200, 'message' => "Cadastro realizado com sucesso", "token" => $data['token'], 'firstname' => $data['firstname'], 'lastname' => $data['lastname'],"user_photo"=>$data['imagem_perfil']];
     }
 
 

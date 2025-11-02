@@ -11,7 +11,7 @@ class UsuarioModel extends Model
 
     public function buscarPorEmail($email)
     {
-        $sql = "SELECT usuario_id, senha, tipo_usuario,primeiro_nome,ultimo_nome,`status` FROM {$this->table} WHERE email = :email ";
+        $sql = "SELECT usuario_id, senha, tipo_usuario,primeiro_nome,ultimo_nome,`status`,imagem_perfil FROM {$this->table} WHERE email = :email ";
         $stmt = $this->conn->prepare($sql);
         $stmt->bindValue(":email", $email);
         $stmt->execute();
