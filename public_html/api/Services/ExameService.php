@@ -19,7 +19,6 @@ class ExameService
             'code' => 200
         ];
     }
-
     private function validarCamposExame($dados)
     {
         $erro = 0;
@@ -74,7 +73,7 @@ class ExameService
             'mensagem' => $mensagem
         ];
     }
-    public function prepareExameData($dados, $usuario_id)
+    private function prepareExameData($dados, $usuario_id)
     {
         $validacao = $this->validarCamposExame($dados);
 
@@ -119,5 +118,60 @@ class ExameService
             $categoriaExameModel->AddData($data);
         }
         return ['code' => 200, 'message' => 'Exame registrado com sucesso'];
+    }
+    public function editExame($dadosUsuario, $dadosFormulario)
+    {
+
+        if (empty($dadosFormulario)) {
+            return ['code' => 401, 'message' => "Dados Inválidos"];
+        }
+
+
+        $dadosExame = $this->prepareExameData($dadosFormulario, $dadosUsuario->usuario_id);
+
+        if (isset($dadosExame['error'])) {
+            $retonro_erro[] = ['code' => 400, 'message' => $dadosExame['message']];
+        }
+
+        if (!empty($retonro_erro)) {
+            return ['code' => 400, 'message' => json_encode($retonro_erro)];
+        }
+
+        $exame_id = $dadosFormulario["exame_id"];
+
+        (new ExameModel($exame_id))->editData($dadosExame['exame']);
+
+        $categoriaExameModel = new CategoriaExameModel();
+        $categoriaExameModel->deleteAll($exame_id);
+
+        foreach ($dadosExame['categorias'] as $cat_id) {
+            $data = [
+                "exame_id" => $exame_id,
+                'categoria_id' => (int) $cat_id
+            ];
+            $categoriaExameModel->AddData($data);
+        }
+        return ['code' => 200, 'message' => 'Exame editado com sucesso'];
+    }
+    public function getExame($id_exame)
+    {
+        $exame_data = (new ExameModel($id_exame))->getExame();
+        if (is_null($exame_data)) {
+            return ['code' => 400, 'message' => 'Exame não encontrado', "data" => []];
+        }
+
+        return [
+            'message' => 'Dados e comentario do Exame',
+            'data' => $exame_data,
+            'code' => 200
+        ];
+    }
+    public function deleteExame($id_exame){
+        if(!$id_exame){
+            return ['code'=> 400, 'message'=> 'Exame invalido'];
+        }
+        (new CategoriaExameModel())->deleteAll($id_exame);
+        (new ExameModel($id_exame))->deleteData();
+        return ['code'=> 200, 'message'=> 'Exame excluido com sucesso!'];
     }
 }

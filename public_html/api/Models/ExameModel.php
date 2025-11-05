@@ -21,4 +21,27 @@ class ExameModel extends Model
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getExame()
+    {
+        $sql = "SELECT * FROM {$this->table}
+        WHERE {$this->table}.{$this->id_column_name} = :exame_id ";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(":exame_id", $this->id);
+        $stmt->execute();
+        $exame = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $sql = "SELECT * FROM comentario_exame
+        INNER JOIN usuario u USING(usuario_id)
+        WHERE {$this->id_column_name} = :exame_id ";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(":exame_id", $this->id);
+        $stmt->execute();
+        $comentarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return [
+            "exame"=> $exame,
+            "comentarios"=>$comentarios
+        ];
+    }
 }

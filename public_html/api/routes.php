@@ -32,7 +32,10 @@ return function (App $app) {
 
     $app->group('/exames', function ($exam) {
         $exam->get('', [ExameController::class,'index']);
+        $exam->post('/buscar-exame', [ExameController::class,'getExame']);
         $exam->post('/adicionar', [ExameController::class,'create']);
+        $exam->post('/editar', [ExameController::class,'edit']);
+        $exam->post('/deletar', [ExameController::class,'delete']);
     })->add(AutenticacaoMiddleware::class);
 
     $app->post('/teste', function ($request, $response) {
