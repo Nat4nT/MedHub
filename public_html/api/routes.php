@@ -3,8 +3,10 @@
 use Api\Controllers\LoginController;
 use Api\Controllers\UsuarioController;
 use Api\Controllers\CategoriaController;
+use Api\Controllers\CondicaoController;
 use Api\Controllers\ExameController;
 use Api\Middlewares\AutenticacaoMiddleware;
+use Api\Services\AutenticacaoService;
 use Slim\App;
 
 
@@ -22,7 +24,7 @@ return function (App $app) {
         $user->post('/deletar', [UsuarioController::class, 'desativarPerfil']);
     })->add(AutenticacaoMiddleware::class);
 
-  
+    $app->get('/condicoes',[CondicaoController::class, 'index'])->add(AutenticacaoMiddleware::class);
 
     $app->group('/categoria', function ($cat) {
         $cat->get('', [CategoriaController::class, 'index']);
@@ -37,6 +39,7 @@ return function (App $app) {
         $exam->post('/editar', [ExameController::class,'edit']);
         $exam->post('/deletar', [ExameController::class,'delete']);
     })->add(AutenticacaoMiddleware::class);
+
 
     $app->post('/teste', function ($request, $response) {
         $authorizationHeader = $request->getHeaderLine('Authorization');

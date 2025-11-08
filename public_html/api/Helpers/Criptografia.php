@@ -24,16 +24,19 @@ class Criptografia
     }
 
 
-    public function decriptarDado(string $encrypted_data): string
+    public function decriptarDado($encrypted_data = ""): string
     {
-        $data = base64_decode($encrypted_data);
-        $ivlen = openssl_cipher_iv_length($this->cipher);
-        $iv = substr($data, 0, $ivlen);
-        $encrypted = substr($data, $ivlen);
 
-        $decrypted = openssl_decrypt($encrypted, $this->cipher, $this->key, 0, $iv);
+        if ($encrypted_data !== null && trim($encrypted_data) !== "") {
+            $data = base64_decode($encrypted_data);
+            $ivlen = openssl_cipher_iv_length($this->cipher);
+            $iv = substr($data, 0, $ivlen);
+            $encrypted = substr($data, $ivlen);
 
+            $decrypted = openssl_decrypt($encrypted, $this->cipher, $this->key, 0, $iv);
 
-        return $decrypted;
+            return $decrypted;
+        }
+        return "";
     }
 }

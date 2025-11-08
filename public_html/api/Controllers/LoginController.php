@@ -17,7 +17,7 @@ class LoginController
         $email = @$data['email'];
         $password = @$data['senha'];
 
-        $data = (new AutenticacaoService())->realizarLogin($email, senha: $password);
+        $data = (new AutenticacaoService())->realizarLogin($email,  $password);
         $json = new JsonResponse();
 
         if (!isset($data['token'])) {

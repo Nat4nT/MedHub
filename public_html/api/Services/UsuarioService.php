@@ -42,6 +42,7 @@ class UsuarioService
 
     private function prepareUserData(array $dados, $is_logged = 0): array
     {
+        $cript = new Criptografia();
 
         $validacao = $this->validarCamposUsuario($dados);
 
@@ -52,9 +53,9 @@ class UsuarioService
         if ($is_logged) {
             $dadosUsuario = [
                 "primeiro_nome" => $dados["primeiro_nome"],
-                'ultimo_nome' => $dados['ultimo_nome'] ,
+                'ultimo_nome' => $dados['ultimo_nome'],
                 'genero' => $dados['genero'] ?? 3,
-                'telefone' => $dados['telefone'] ?? null,
+                'telefone' => $dados['telefone'] ? $cript->encriptarDado($dados['telefone']) : null,
                 'email' => $dados['email'],
                 'consentimento_lgpd' => $dados['consentimento_lgpd'] ?? 0
             ];
@@ -64,8 +65,8 @@ class UsuarioService
                 "primeiro_nome" => $dados["primeiro_nome"],
                 'ultimo_nome' => $dados['ultimo_nome'],
                 'genero' => $dados['genero'] ?? 3,
-                'cpf' => (new Criptografia())->encriptarDado($dados['cpf']),
-                'telefone' => $dados['telefone'] ?? null,
+                'cpf' => $cript->encriptarDado($dados['cpf']),
+                'telefone' => $dados['telefone'] ? $cript->encriptarDado($dados['telefone']) : null,
                 'email' => $dados['email'],
                 'consentimento_lgpd' => $dados['consentimento_lgpd'] ?? 0
             ];
@@ -125,15 +126,16 @@ class UsuarioService
         if ($validacao['erro']) {
             return ["message" => $validacao['mensagem'], 'error' => 1];
         }
+        $cript = new Criptografia();
         return [
             'usuario_id' => $usuarioId,
-            'rua' => $dadosEnderecoForm['rua'],
-            'bairro' => $dadosEnderecoForm['bairro'],
-            'numero' => $dadosEnderecoForm['numero'],
-            'cep' => $dadosEnderecoForm['cep'],
-            'cidade' => $dadosEnderecoForm['cidade'],
+            'rua' => $cript->encriptarDado($dadosEnderecoForm['rua']),
+            'bairro' => $cript->encriptarDado($dadosEnderecoForm['bairro']),
+            'numero' => $cript->encriptarDado($dadosEnderecoForm['numero']),
+            'cep' => $cript->encriptarDado($dadosEnderecoForm['cep']),
+            'cidade' => $cript->encriptarDado($dadosEnderecoForm['cidade']),
             'estado' => $dadosEnderecoForm['estado'],
-            'complemento' => $dadosEnderecoForm['complemento'] ?? ''
+            'complemento' => $dadosEnderecoForm['complemento'] ? $cript->encriptarDado($dadosEnderecoForm['complemento']) :  ''
         ];
     }
 
@@ -190,17 +192,20 @@ class UsuarioService
         if ($validacao['erro']) {
             return ["message" => $validacao['mensagem'], 'error' => 1];
         }
+        $cript = new Criptografia();
 
+
+        // TODO dados para criptografar (Doencas,Alergias, Altura,peso e tipo sanguineo)
         $dados_usuario = [
             'paciente_id' => $usuarioId,
             'data_nascimento' => $dados['data_nascimento'],
-            'peso' => @$dados['peso'],
-            'altura' => @$dados['altura'],
-            'doencas_diagnosticadas' => isset($dados['doencas_diagnosticadas']) ? json_encode(@$dados['doencas_diagnosticadas']) : null,
-            'desc_deficiencia' => @$dados['desc_deficiencia'],
-            'tipo_sanguineo' => @$dados['tipo_sanguineo'],
-            'alergias' => isset($dados['alergias']) ? json_encode(@$dados['alergias']) : null,
-            'medicacao' => isset($dados['medicacao']) ? json_encode(@$dados['medicacao']) : null,
+            'peso' => isset($dados['peso']) ? $cript->encriptarDado($dados['peso']) : "",
+            'altura' => isset($dados['altura']) ? $cript->encriptarDado($dados['altura']) : "",
+            'doencas_diagnosticadas' => isset($dados['doencas_diagnosticadas']) ? $cript->encriptarDado(json_encode(value: isset($dados['doencas_diagnosticadas'])) ? $cript->encriptarDado($dados['']) : "") : null,
+            'desc_deficiencia' => isset($dados['desc_deficiencia']) ? $cript->encriptarDado($dados['desc_deficiencia']) : "",
+            'tipo_sanguineo' => isset($dados['tipo_sanguineo']) ? $cript->encriptarDado($dados['tipo_sanguineo']) : "",
+            'alergias' => isset($dados['alergias']) ?  $cript->encriptarDado(json_encode($dados['alergias'])) : "",
+            'medicacao' => isset($dados['medicacao']) ?  $cript->encriptarDado(json_encode($dados['medicacao'])) : "",
         ];
 
         return $dados_usuario;
@@ -267,8 +272,8 @@ class UsuarioService
             (new PacienteModel())->addData($dadosTipoUsuario);
         }
 
-        $data = (new AutenticacaoService())->realizarLogin($dados['email'], $senhaLogin);
-        return ['code' => 200, 'message' => "Cadastro realizado com sucesso", "token" => $data['token'], 'firstname' => $data['firstname'], 'lastname' => $data['lastname'],"user_photo"=>$data['imagem_perfil']];
+        $data = (new AutenticacaoService())->realizarLogin(($dados['email']), $senhaLogin);
+        return ['code' => 200, 'message' => "Cadastro realizado com sucesso", "token" => $data['token'], 'firstname' => $data['firstname'], 'lastname' => $data['lastname'], "user_photo" => $data['imagem_perfil']];
     }
 
 
@@ -279,9 +284,26 @@ class UsuarioService
         if ($dados && $dados['status'] == 1) {
             $coluna = $dadosUsuario->tipo_usuario . '_id';
             unset($dados['usuario_id'], $dados[$coluna], $dados['endereco_id']);
+            $criptar = new Criptografia();
 
-            $dados['cpf'] = (new Criptografia())->decriptarDado($dados['cpf']);
+            $dados['cpf'] = $criptar->decriptarDado($dados['cpf']);
+            $dados['telefone'] = $criptar->decriptarDado($dados['telefone']);
 
+            if ($dadosUsuario->tipo_usuario == 'paciente') {
+                $dados['tipo_sanguineo'] = $criptar->decriptarDado($dados['tipo_sanguineo'] ?? "");
+                $dados['desc_deficiencia'] = $criptar->decriptarDado($dados['desc_deficiencia'] ?? "");
+                $dados['altura'] = $criptar->decriptarDado($dados['altura'] ?? "");
+                $dados['peso'] = $criptar->decriptarDado($dados['peso'] ?? "");
+                $dados['alergias'] = $criptar->decriptarDado($dados['alergias'] ?? "");
+                $dados['doencas_diagnosticadas'] = $criptar->decriptarDado(@$dados['doencas_diagnosticadas'] ?? "");
+            }
+            $dados['cep'] = $criptar->decriptarDado($dados['cep']);
+            $dados['rua'] = $criptar->decriptarDado($dados['rua']);
+            $dados['numero'] = $criptar->decriptarDado($dados['numero']);
+            $dados['bairro'] = $criptar->decriptarDado($dados['bairro']);
+            $dados['cidade'] = $criptar->decriptarDado($dados['cidade']);
+            $dados['complemento'] = $criptar->decriptarDado($dados['complemento']);
+            
             return [
                 "message" => 'Perfil encontrado',
                 'data' => $dados,
@@ -303,7 +325,7 @@ class UsuarioService
         $tipoUsuario = $dadosSessao->tipo_usuario;
         $retonro_erro = [];
 
-        $dadosUsuario = $this->prepareUserData($dadosFormulario,$usuarioId);
+        $dadosUsuario = $this->prepareUserData($dadosFormulario, $usuarioId);
 
         if (isset($dadosFormulario['senha']) && empty($dadosFormulario['senha'])) {
             unset($dadosUsuario['senha']);
