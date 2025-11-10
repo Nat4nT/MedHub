@@ -5,8 +5,9 @@ use Api\Controllers\UsuarioController;
 use Api\Controllers\CategoriaController;
 use Api\Controllers\CondicaoController;
 use Api\Controllers\ExameController;
+use Api\Controllers\MedicoController;
 use Api\Middlewares\AutenticacaoMiddleware;
-use Api\Services\AutenticacaoService;
+use Api\Middlewares\TipeMiddleware;
 use Slim\App;
 
 
@@ -24,7 +25,7 @@ return function (App $app) {
         $user->post('/deletar', [UsuarioController::class, 'desativarPerfil']);
     })->add(AutenticacaoMiddleware::class);
 
-    $app->get('/condicoes',[CondicaoController::class, 'index'])->add(AutenticacaoMiddleware::class);
+    $app->get('/condicoes', [CondicaoController::class, 'index'])->add(AutenticacaoMiddleware::class);
 
     $app->group('/categoria', function ($cat) {
         $cat->get('', [CategoriaController::class, 'index']);
@@ -32,12 +33,18 @@ return function (App $app) {
         $cat->post('/deletar', [CategoriaController::class, 'delete']);
     })->add(AutenticacaoMiddleware::class);
 
+
+    $app->group("/paciente", function ($pac) {})->add(AutenticacaoMiddleware::class)->add(TipeMiddleware::class);
+    $app->group("/medico", function ($med) {
+        $med->post('/solicitar_acesso',[MedicoController::class,'solicitarAcesso']);
+    })->add(AutenticacaoMiddleware::class)->add(TipeMiddleware::class);
+
     $app->group('/exames', function ($exam) {
-        $exam->get('', [ExameController::class,'index']);
-        $exam->post('/buscar-exame', [ExameController::class,'getExame']);
-        $exam->post('/adicionar', [ExameController::class,'create']);
-        $exam->post('/editar', [ExameController::class,'edit']);
-        $exam->post('/deletar', [ExameController::class,'delete']);
+        $exam->get('', [ExameController::class, 'index']);
+        $exam->post('/buscar-exame', [ExameController::class, 'getExame']);
+        $exam->post('/adicionar', [ExameController::class, 'create']);
+        $exam->post('/editar', [ExameController::class, 'edit']);
+        $exam->post('/deletar', [ExameController::class, 'delete']);
     })->add(AutenticacaoMiddleware::class);
 
 

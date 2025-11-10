@@ -29,7 +29,7 @@ class Token
             'iat' => $agora->getTimestamp(),
             'exp' => $expira,
         ]);
-        
+    
 
         return JWT::encode($dados, $secret, 'HS256');
     }

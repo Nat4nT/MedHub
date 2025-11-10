@@ -194,14 +194,13 @@ class UsuarioService
         }
         $cript = new Criptografia();
 
-
         // TODO dados para criptografar (Doencas,Alergias, Altura,peso e tipo sanguineo)
         $dados_usuario = [
             'paciente_id' => $usuarioId,
             'data_nascimento' => $dados['data_nascimento'],
             'peso' => isset($dados['peso']) ? $cript->encriptarDado($dados['peso']) : "",
             'altura' => isset($dados['altura']) ? $cript->encriptarDado($dados['altura']) : "",
-            'doencas_diagnosticadas' => isset($dados['doencas_diagnosticadas']) ? $cript->encriptarDado(json_encode(value: isset($dados['doencas_diagnosticadas'])) ? $cript->encriptarDado($dados['']) : "") : null,
+            'doencas_diagnosticadas' => isset($dados['doencas_diagnosticadas']) ? $cript->encriptarDado(json_encode($dados['doencas_diagnosticadas'])) : "",
             'desc_deficiencia' => isset($dados['desc_deficiencia']) ? $cript->encriptarDado($dados['desc_deficiencia']) : "",
             'tipo_sanguineo' => isset($dados['tipo_sanguineo']) ? $cript->encriptarDado($dados['tipo_sanguineo']) : "",
             'alergias' => isset($dados['alergias']) ?  $cript->encriptarDado(json_encode($dados['alergias'])) : "",
@@ -292,6 +291,7 @@ class UsuarioService
             if ($dadosUsuario->tipo_usuario == 'paciente') {
                 $dados['tipo_sanguineo'] = $criptar->decriptarDado($dados['tipo_sanguineo'] ?? "");
                 $dados['desc_deficiencia'] = $criptar->decriptarDado($dados['desc_deficiencia'] ?? "");
+                $dados['medicacao'] = $criptar->decriptarDado($dados['medicacao'] ?? "");
                 $dados['altura'] = $criptar->decriptarDado($dados['altura'] ?? "");
                 $dados['peso'] = $criptar->decriptarDado($dados['peso'] ?? "");
                 $dados['alergias'] = $criptar->decriptarDado($dados['alergias'] ?? "");

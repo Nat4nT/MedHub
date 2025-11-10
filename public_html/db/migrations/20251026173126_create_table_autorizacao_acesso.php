@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Phinx\Migration\AbstractMigration;
 
-final class CreateTableAtutorizacaoAcesso extends AbstractMigration
+final class CreateTableAutorizacaoAcesso extends AbstractMigration
 {
 
     public function change(): void
@@ -16,7 +16,8 @@ final class CreateTableAtutorizacaoAcesso extends AbstractMigration
         $table = $this->table($tableName, ['id' => 'autorizacao_acesso_id']);
         $table->addColumn('paciente_id', 'integer', ['limit' => 11, 'signed' => false])
             ->addColumn('medico_id', 'integer', ['limit' => 11, 'signed' => false])
-            ->addTimestamps('data_criacao', 'data_atualizacao')->addColumn('status', 'boolean', ['default' => false])
+            ->addColumn('status', 'boolean', ['default' => false])
+            ->addTimestamps('data_criacao', 'data_atualizacao')
             ->addForeignKey('paciente_id', 'paciente', 'paciente_id', [
                 'delete' => 'CASCADE',
                 'update' => 'NO_ACTION'
