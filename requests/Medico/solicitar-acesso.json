@@ -1,0 +1,10 @@
+{
+  "route": "localhost:8080/medico/solicitar-acesso",
+  "method": "GET",
+  "Header": {
+    "Auth": "Bearer token"
+  },
+  "body": {
+    "paciente_id": 2
+  }
+}

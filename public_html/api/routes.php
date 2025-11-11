@@ -6,6 +6,7 @@ use Api\Controllers\CategoriaController;
 use Api\Controllers\CondicaoController;
 use Api\Controllers\ExameController;
 use Api\Controllers\MedicoController;
+use Api\Controllers\PacienteController;
 use Api\Middlewares\AutenticacaoMiddleware;
 use Api\Middlewares\TipeMiddleware;
 use Slim\App;
@@ -23,6 +24,7 @@ return function (App $app) {
         $user->get('', [UsuarioController::class, 'pegarDadosConta']);
         $user->post('', [UsuarioController::class, 'editarUsuario']);
         $user->post('/deletar', [UsuarioController::class, 'desativarPerfil']);
+        $user->get('/solicitacoes', [PacienteController::class, 'buscarSolicitacoes']);
     })->add(AutenticacaoMiddleware::class);
 
     $app->get('/condicoes', [CondicaoController::class, 'index'])->add(AutenticacaoMiddleware::class);
