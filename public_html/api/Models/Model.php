@@ -19,8 +19,6 @@ abstract class Model
         $this->conn = (new DB())->conn();
         $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
-
-
     public function getInfo()
     {
         $sql = "SELECT * FROM {$this->table} WHERE {$this->id_column_name} =:id";
@@ -29,6 +27,8 @@ abstract class Model
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+
 
     public function getData(array $options = []): array
     {
@@ -172,7 +172,7 @@ abstract class Model
 
         $clientFilename = $fileObject->getClientFilename();
         $extension = strtolower(pathinfo($clientFilename, PATHINFO_EXTENSION));
-        $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf'];
 
         if (!in_array($extension, $allowedTypes)) return null;
 
