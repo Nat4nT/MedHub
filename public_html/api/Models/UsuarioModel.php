@@ -33,4 +33,13 @@ class UsuarioModel extends Model
         $stmt->execute();
         return $stmt->rowCount();
     }
+
+    public function buscarUsuarioPorPerfil(string $dadoCripto)
+    {
+        $sql = "SELECT * FROM {$this->table} INNER JOIN paciente ON paciente_id = {$this->id_column_name}  WHERE cpf = :cpf AND status = 1";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(":cpf",$dadoCripto);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 }

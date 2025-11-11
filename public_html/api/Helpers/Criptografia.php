@@ -18,7 +18,10 @@ class Criptografia
     public function encriptarDado(string $data): string
     {
         $ivlen = openssl_cipher_iv_length($this->cipher);
-        $iv = openssl_random_pseudo_bytes($ivlen);
+
+        // Gera um IV fixo (determinístico) com base no valor original
+        $iv = substr(hash('sha256', $data), 0, $ivlen);
+
         $encrypted = openssl_encrypt($data, $this->cipher, $this->key, 0, $iv);
         return base64_encode($iv . $encrypted);
     }
@@ -26,7 +29,6 @@ class Criptografia
 
     public function decriptarDado($encrypted_data = ""): string
     {
-
         if ($encrypted_data !== null && trim($encrypted_data) !== "") {
             $data = base64_decode($encrypted_data);
             $ivlen = openssl_cipher_iv_length($this->cipher);
@@ -34,7 +36,6 @@ class Criptografia
             $encrypted = substr($data, $ivlen);
 
             $decrypted = openssl_decrypt($encrypted, $this->cipher, $this->key, 0, $iv);
-
             return $decrypted;
         }
         return "";

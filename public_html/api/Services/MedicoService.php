@@ -2,7 +2,9 @@
 
 namespace Api\Services;
 
+use Api\Helpers\Criptografia;
 use Api\Models\AutorizacaoAcessoModel;
+use Api\Models\UsuarioModel;
 
 class MedicoService
 {
@@ -19,6 +21,16 @@ class MedicoService
             return ['code' => 200, 'message' => 'Solicitação enviada!'];
         } else {
             return ['code' => 400, 'message' => "Dados Invalidos"];
+        }
+    }
+
+    public function buscar_usuario($dado)
+    {
+        $usuario = (new UsuarioModel())->buscarUsuarioPorPerfil((new Criptografia())->encriptarDado($dado));
+        if ($usuario) {
+            return ["code" => 200, "message" => "Perfil Encontrado", "data" => $usuario];
+        } else {
+            return ["code" => 400, "message" => "Perfil não encontrado", "data" => []];
         }
     }
 }

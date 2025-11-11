@@ -7,14 +7,13 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface as Handler;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Psr7\Response as SlimResponse;
-use Api\Helpers\Criptografia;
 
 class TipeMiddleware implements MiddlewareInterface
 {
     public function process(Request $request, Handler $handler): Response
     {
         $usuario = $request->getAttribute('usuario');
-
+        
         if (!$usuario) {
             return $this->unauthorized('Token não encontrado');
         }

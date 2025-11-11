@@ -35,9 +35,11 @@ return function (App $app) {
 
 
     $app->group("/paciente", function ($pac) {})->add(AutenticacaoMiddleware::class)->add(TipeMiddleware::class);
+    
     $app->group("/medico", function ($med) {
-        $med->post('/solicitar_acesso',[MedicoController::class,'solicitarAcesso']);
-    })->add(AutenticacaoMiddleware::class)->add(TipeMiddleware::class);
+        $med->post('/solicitar-acesso',[MedicoController::class,'solicitarAcesso']);
+        $med->post('/buscar',[MedicoController::class,'buscarPaciente']);
+    })->add(TipeMiddleware::class)->add(AutenticacaoMiddleware::class);
 
     $app->group('/exames', function ($exam) {
         $exam->get('', [ExameController::class, 'index']);
