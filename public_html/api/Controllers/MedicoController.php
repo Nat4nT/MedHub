@@ -14,7 +14,11 @@ class MedicoController
     {
         $jsonResponse = new JsonResponse();
         $medico = $request->getAttribute('usuario');
-        $paciente = $request->getParsedBody()['paciente_id'];
+        $paciente = $request->getParsedBody();
+
+        if(!isset($paciente['paciente_id'])){
+            return $jsonResponse->emitirResposta($response,['message'=>"Dados Invalidos","code"=> 400]);
+        }
 
         $resposta = (new MedicoService())->solicitar_acesso($medico->usuario_id, $paciente);
         return $jsonResponse->emitirResposta($response, ["message" => $resposta['message'], 'code' => $resposta['code']], $resposta['code']);
@@ -29,7 +33,7 @@ class MedicoController
         $resposta = (new MedicoService())->buscar_usuario($dado_pesquisa);
 
         $dados_usuario  = [
-            
+
         ];
 
         return $jsonResponse->emitirResposta($response, ['message' => $resposta['message'], 'code' => $resposta['code'], 'data' => $resposta['data']], $resposta['code']);

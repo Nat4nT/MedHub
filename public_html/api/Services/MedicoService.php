@@ -21,7 +21,7 @@ class MedicoService
         $acessoModel = new AutorizacaoAcessoModel();
 
 
-        if ($medico_id && $paciente_id) {
+        if (!is_null($medico_id) && !is_null($paciente_id)) {
             if (!$acessoModel->buscarSolicitacao($paciente_id, $medico_id)) {
                 (new AutorizacaoAcessoModel())->AddData($data);
                 return ['code' => 200, 'message' => 'Solicitação enviada!'];
@@ -40,6 +40,7 @@ class MedicoService
         // var_dump($usuario);
         $dados = [];
 
+        $dados['paciente_id'] = $usuario['paciente_id'];
         $dados['cpf'] = $criptar->decriptarDado($usuario['cpf']);
         $dados['telefone'] = $criptar->decriptarDado($usuario['telefone']);
         $dados['tipo_sanguineo'] = $criptar->decriptarDado($usuario['tipo_sanguineo'] ?? "");

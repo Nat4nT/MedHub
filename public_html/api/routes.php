@@ -41,7 +41,6 @@ return function (App $app) {
     })->add(AutenticacaoMiddleware::class);
 
 
-    $app->group("/paciente", function ($pac) {})->add(AutenticacaoMiddleware::class)->add(TipeMiddleware::class);
     
     $app->group("/medico", function ($med) {
         $med->post('/solicitar-acesso',[MedicoController::class,'solicitarAcesso']);
