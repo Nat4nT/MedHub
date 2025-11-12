@@ -16,7 +16,7 @@ final class CreateTableAutorizacaoAcesso extends AbstractMigration
         $table = $this->table($tableName, ['id' => 'autorizacao_acesso_id']);
         $table->addColumn('paciente_id', 'integer', ['limit' => 11, 'signed' => false])
             ->addColumn('medico_id', 'integer', ['limit' => 11, 'signed' => false])
-            ->addColumn('status', 'boolean', ['default' => false])
+            ->addColumn('status', 'enum',['values'=>['PENDENTE','REVOGADO','APROVADO'],'default'=> "PENDENTE"])
             ->addTimestamps('data_criacao', 'data_atualizacao')
             ->addForeignKey('paciente_id', 'paciente', 'paciente_id', [
                 'delete' => 'CASCADE',

@@ -21,13 +21,14 @@ class PacienteService
                 'imagem_perfil'=> $solicitacao['imagem_perfil'],
                 'especialidade'=> $solicitacao['especialidade'],
                 'crm'=> $solicitacao['crm'],
+                'status'=> $solicitacao['status_solicitacao'],
                 'estado_atuacao'=> $solicitacao['estado_atuacao'],
                 'genero'=> $solicitacao['genero'],
-                'data_criacao'=> $solicitacao['data_criacao'],
-    
+                'data_criacao'=> $solicitacao['data_solicitacao'],
             ];
         }
 
+        
 
         if ($solicitacoes) {
             return ["code" => 200, "message" => "Solicitações encontradas", "data" => $data];
@@ -38,13 +39,13 @@ class PacienteService
 
     public function negarSolicitacao($solicitacao_id)
     {
-        $data['status'] = 3;
+        $data['status'] = "NEGADO";
         (new AutorizacaoAcessoModel($solicitacao_id))->editData($data);
         return ["code" => 200, "message" => "Solicitação negada!"];
     }
     public function aceitarSolicitacao($solicitacao_id)
     {
-        $data['status'] = 2;
+        $data['status'] = 'APROVADO';
         (new AutorizacaoAcessoModel($solicitacao_id))->editData($data);
         return ["code" => 200, "message" => "Solicitação aprovada!"];
     }

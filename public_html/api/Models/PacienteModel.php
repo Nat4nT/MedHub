@@ -11,7 +11,7 @@ class PacienteModel extends Model
 
     public function buscarSolicitacoes()
     {
-        $sql = "SELECT * FROM autorizacao_acesso 
+        $sql = "SELECT *, ac.`status` as status_solicitacao, ac.data_criacao as data_solicitacao  FROM autorizacao_acesso ac
         INNER JOIN medico USING(medico_id)
         INNER JOIN usuario ON usuario_id = medico_id
         WHERE {$this->id_column_name} = {$this->id}";
