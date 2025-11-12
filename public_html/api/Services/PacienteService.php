@@ -18,6 +18,7 @@ class PacienteService
                 'solcitacao_id'=>$solicitacao['autorizacao_acesso_id'],
                 'primeiro_nome'=> $solicitacao['primeiro_nome'],
                 'ultimo_nome'=> $solicitacao['ultimo_nome'],
+                'imagem_perfil'=> $solicitacao['imagem_perfil'],
                 'especialidade'=> $solicitacao['especialidade'],
                 'crm'=> $solicitacao['crm'],
                 'estado_atuacao'=> $solicitacao['estado_atuacao'],
