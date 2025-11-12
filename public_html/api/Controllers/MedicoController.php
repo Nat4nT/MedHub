@@ -20,7 +20,7 @@ class MedicoController
             return $jsonResponse->emitirResposta($response,['message'=>"Dados Invalidos","code"=> 400]);
         }
 
-        $resposta = (new MedicoService())->solicitar_acesso($medico->usuario_id, $paciente);
+        $resposta = (new MedicoService())->solicitar_acesso($medico->usuario_id, $paciente['paciente_id']);
         return $jsonResponse->emitirResposta($response, ["message" => $resposta['message'], 'code' => $resposta['code']], $resposta['code']);
     }
 
