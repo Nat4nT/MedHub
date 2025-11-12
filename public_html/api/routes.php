@@ -24,7 +24,12 @@ return function (App $app) {
         $user->get('', [UsuarioController::class, 'pegarDadosConta']);
         $user->post('', [UsuarioController::class, 'editarUsuario']);
         $user->post('/deletar', [UsuarioController::class, 'desativarPerfil']);
-        $user->get('/solicitacoes', [PacienteController::class, 'buscarSolicitacoes']);
+        $user->group('/solicitacoes', function ($solicitacao) {
+            $solicitacao->get('', [PacienteController::class, 'buscarSolicitacoes']);
+            $solicitacao->post('/negar', [PacienteController::class, 'negarSolicitacao']);
+            $solicitacao->post('/aprovar', [PacienteController::class, 'aceitarSolicitacao']);
+
+        });
     })->add(AutenticacaoMiddleware::class);
 
     $app->get('/condicoes', [CondicaoController::class, 'index'])->add(AutenticacaoMiddleware::class);
@@ -41,6 +46,7 @@ return function (App $app) {
     $app->group("/medico", function ($med) {
         $med->post('/solicitar-acesso',[MedicoController::class,'solicitarAcesso']);
         $med->post('/buscar',[MedicoController::class,'buscarPaciente']);
+        $med->post('/buscar-exames',[MedicoController::class,"buscarExamesPaciente"]);
     })->add(TipeMiddleware::class)->add(AutenticacaoMiddleware::class);
 
     $app->group('/exames', function ($exam) {

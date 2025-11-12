@@ -12,9 +12,9 @@ class PacienteModel extends Model
     public function buscarSolicitacoes()
     {
         $sql = "SELECT * FROM autorizacao_acesso 
-        INNER JOIN paciente USING({$this->id_column_name})
         INNER JOIN medico USING(medico_id)
-           WHERE {$this->id_column_name} = {$this->id}";
+        INNER JOIN usuario ON usuario_id = medico_id
+        WHERE {$this->id_column_name} = {$this->id}";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
