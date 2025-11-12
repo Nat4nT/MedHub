@@ -39,7 +39,7 @@ class PacienteService
 
     public function negarSolicitacao($solicitacao_id)
     {
-        $data['status'] = "NEGADO";
+        $data['status'] = "REVOGADO";
         (new AutorizacaoAcessoModel($solicitacao_id))->editData($data);
         return ["code" => 200, "message" => "Solicitação negada!"];
     }
