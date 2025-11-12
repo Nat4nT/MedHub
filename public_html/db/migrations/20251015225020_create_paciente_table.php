@@ -19,7 +19,6 @@ final class CreatePacienteTable extends AbstractMigration
             "primary_key" => ['paciente_id']
         ]);
         $table->addColumn('paciente_id', 'integer', ['signed' => false, 'null' => false])
-            ->addColumn('data_nascimento', 'date', ['null' => false])
             ->AddColumn('peso', 'text', ['limit' => MysqlAdapter::TEXT_LONG])
             ->AddColumn('altura', 'text', ['limit' => MysqlAdapter::TEXT_LONG])
             // ->AddColumn('peso', 'decimal', ['precision' => 5, 'scale' => 2, 'null' => true, 'default' => null])

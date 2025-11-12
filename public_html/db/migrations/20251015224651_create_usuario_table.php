@@ -26,6 +26,7 @@ final class CreateUsuarioTable extends AbstractMigration
             ->addColumn('senha', 'text', ['limit' => MysqlAdapter::TEXT_LONG])
             ->addColumn('consentimento_lgpd', 'boolean', ['default' => false])
             ->addColumn('status', 'boolean', ['default' => true])
+            ->addColumn('data_nascimento', 'date', ['null' => false])
             ->addIndex(['email'], ['unique' => true])
             ->addTimestamps('data_criacao', 'data_atualizacao')->create();
     }

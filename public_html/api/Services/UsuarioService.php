@@ -52,6 +52,7 @@ class UsuarioService
 
         if ($is_logged) {
             $dadosUsuario = [
+                'data_nascimento' => $dados['data_nascimento'],
                 "primeiro_nome" => $dados["primeiro_nome"],
                 'ultimo_nome' => $dados['ultimo_nome'],
                 'genero' => $dados['genero'] ?? 3,
@@ -61,6 +62,7 @@ class UsuarioService
             ];
         } else {
             $dadosUsuario = [
+                'data_nascimento' => $dados['data_nascimento'],
                 'tipo_usuario' => $dados['tipo_usuario'],
                 "primeiro_nome" => $dados["primeiro_nome"],
                 'ultimo_nome' => $dados['ultimo_nome'],
@@ -197,7 +199,6 @@ class UsuarioService
         // TODO dados para criptografar (Doencas,Alergias, Altura,peso e tipo sanguineo)
         $dados_usuario = [
             'paciente_id' => $usuarioId,
-            'data_nascimento' => $dados['data_nascimento'],
             'peso' => isset($dados['peso']) ? $cript->encriptarDado($dados['peso']) : "",
             'altura' => isset($dados['altura']) ? $cript->encriptarDado($dados['altura']) : "",
             'doencas_diagnosticadas' => isset($dados['doencas_diagnosticadas']) ? $cript->encriptarDado(json_encode($dados['doencas_diagnosticadas'])) : "",
@@ -303,7 +304,7 @@ class UsuarioService
             $dados['bairro'] = $criptar->decriptarDado($dados['bairro']);
             $dados['cidade'] = $criptar->decriptarDado($dados['cidade']);
             $dados['complemento'] = $criptar->decriptarDado($dados['complemento']);
-            
+
             return [
                 "message" => 'Perfil encontrado',
                 'data' => $dados,
